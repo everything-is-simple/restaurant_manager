@@ -22,3 +22,9 @@ RuoYi-Vue/.git/
 
 # Backup archives (too large for git)
 docs/backup/*.zip
+
+# Screenshots (browser agent temp files)
+*.png
+
+# RuoYi-Vue legacy doc duplicates
+RuoYi-Vue/doc/

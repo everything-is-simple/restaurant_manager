@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TStockInMapper">
+    
+    <resultMap type="TStockIn" id="TStockInResult">
+        <result property="stockInId"    column="stock_in_id"    />
+        <result property="ingredientId"    column="ingredient_id"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="unitPrice"    column="unit_price"    />
+        <result property="inTime"    column="in_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectTStockInVo">
+        select stock_in_id, ingredient_id, quantity, unit_price, in_time, del_flag, create_by, create_time, update_by, update_time, remark from t_stock_in
+    </sql>
+
+    <select id="selectTStockInList" parameterType="TStockIn" resultMap="TStockInResult">
+        <include refid="selectTStockInVo"/>
+        <where>  
+            <if test="ingredientId != null "> and ingredient_id = #{ingredientId}</if>
+            <if test="quantity != null "> and quantity = #{quantity}</if>
+            <if test="unitPrice != null "> and unit_price = #{unitPrice}</if>
+            <if test="inTime != null "> and in_time = #{inTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectTStockInByStockInId" parameterType="Long" resultMap="TStockInResult">
+        <include refid="selectTStockInVo"/>
+        where stock_in_id = #{stockInId}
+    </select>
+
+    <insert id="insertTStockIn" parameterType="TStockIn" useGeneratedKeys="true" keyProperty="stockInId">
+        insert into t_stock_in
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ingredientId != null">ingredient_id,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="unitPrice != null">unit_price,</if>
+            <if test="inTime != null">in_time,</if>
+            <if test="delFlag != null and delFlag != ''">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ingredientId != null">#{ingredientId},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="unitPrice != null">#{unitPrice},</if>
+            <if test="inTime != null">#{inTime},</if>
+            <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTStockIn" parameterType="TStockIn">
+        update t_stock_in
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ingredientId != null">ingredient_id = #{ingredientId},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="unitPrice != null">unit_price = #{unitPrice},</if>
+            <if test="inTime != null">in_time = #{inTime},</if>
+            <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where stock_in_id = #{stockInId}
+    </update>
+
+    <delete id="deleteTStockInByStockInId" parameterType="Long">
+        delete from t_stock_in where stock_in_id = #{stockInId}
+    </delete>
+
+    <delete id="deleteTStockInByStockInIds" parameterType="String">
+        delete from t_stock_in where stock_in_id in 
+        <foreach item="stockInId" collection="array" open="(" separator="," close=")">
+            #{stockInId}
+        </foreach>
+    </delete>
+</mapper>
