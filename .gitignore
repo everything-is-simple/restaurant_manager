@@ -1,0 +1,24 @@
+# IDE / AI
+.claude/
+.qoder/
+.idea/
+.vscode/
+
+# Build outputs
+RuoYi-Vue/**/target/
+RuoYi-Vue/ruoyi-ui/node_modules/
+RuoYi-Vue/ruoyi-ui/dist/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+
+# RuoYi-Vue legacy git (archived)
+RuoYi-Vue/.git-legacy/
+RuoYi-Vue/.git/
+
+# Backup archives (too large for git)
+docs/backup/*.zip
