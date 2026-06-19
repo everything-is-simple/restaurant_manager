@@ -16,11 +16,11 @@
 | [01_PRD_产品需求文档.md](plan_ruoyi_classic/01_PRD_产品需求文档.md) | 项目背景、角色、功能范围、不做清单、验收标准 |
 | [02_TRD_技术方案与安装使用说明.md](plan_ruoyi_classic/02_TRD_技术方案与安装使用说明.md) | 技术选型、安装步骤、接口清单、工程落位 |
 | [03_Design_系统设计文档.md](plan_ruoyi_classic/03_Design_系统设计文档.md) | 架构、模块、数据流、权限矩阵 |
-| [04_Task_10天施工任务清单.md](plan_ruoyi_classic/04_Task_10天施工任务清单.md) | D1-D10 逐日排期与完成标志 |
+| [04_施工计划_当前进度版.md](plan_ruoyi_classic/04_施工计划_当前进度版.md) | D1-D10 逐日排期 + 当前进度标记 + 业务算法清单 |
 | [05_Core_Algorithm_核心算法说明.md](plan_ruoyi_classic/05_Core_Algorithm_核心算法说明.md) | 扣库存事务、状态机、看板统计 SQL |
 | [08_Menu_Permission_菜单与权限初始化清单.md](plan_ruoyi_classic/08_Menu_Permission_菜单与权限初始化清单.md) | 菜单树、按钮权限、角色分配 |
 | [schema.sql](plan_ruoyi_classic/schema.sql) | 8 张业务表 + 演示数据 |
-| [current_status_gap_report.md](current_status_gap_report.md) | 现况与缺口分析报告 |
+| [gen_config_update.sql](plan_ruoyi_classic/gen_config_update.sql) | 若依代码生成器配置脚本（包名/模块名/字典） |
 
 ## 技术栈速览
 
