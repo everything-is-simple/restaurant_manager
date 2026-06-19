@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TDishIngredientMapper">
+    
+    <resultMap type="TDishIngredient" id="TDishIngredientResult">
+        <result property="dishIngredientId"    column="dish_ingredient_id"    />
+        <result property="dishId"    column="dish_id"    />
+        <result property="ingredientId"    column="ingredient_id"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="ingredientName"    column="ingredient_name"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectTDishIngredientVo">
+        select di.dish_ingredient_id, di.dish_id, di.ingredient_id, di.quantity,
+               i.name as ingredient_name,
+               di.create_by, di.create_time, di.update_by, di.update_time, di.remark
+        from t_dish_ingredient di
+        left join t_ingredient i on di.ingredient_id = i.ingredient_id
+    </sql>
+
+    <select id="selectTDishIngredientList" parameterType="TDishIngredient" resultMap="TDishIngredientResult">
+        <include refid="selectTDishIngredientVo"/>
+        <where>  
+            <if test="dishId != null "> and di.dish_id = #{dishId}</if>
+            <if test="ingredientId != null "> and di.ingredient_id = #{ingredientId}</if>
+        </where>
+    </select>
+    
+    <select id="selectTDishIngredientByDishId" parameterType="Long" resultMap="TDishIngredientResult">
+        <include refid="selectTDishIngredientVo"/>
+        where di.dish_id = #{dishId}
+    </select>
+
+    <insert id="insertTDishIngredient" parameterType="TDishIngredient" useGeneratedKeys="true" keyProperty="dishIngredientId">
+        insert into t_dish_ingredient
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dishId != null">dish_id,</if>
+            <if test="ingredientId != null">ingredient_id,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dishId != null">#{dishId},</if>
+            <if test="ingredientId != null">#{ingredientId},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <insert id="batchInsertTDishIngredient" parameterType="java.util.List">
+        insert into t_dish_ingredient (dish_id, ingredient_id, quantity, create_by, create_time)
+        values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.dishId}, #{item.ingredientId}, #{item.quantity}, #{item.createBy}, #{item.createTime})
+        </foreach>
+    </insert>
+
+    <delete id="deleteTDishIngredientByDishId" parameterType="Long">
+        delete from t_dish_ingredient where dish_id = #{dishId}
+    </delete>
+</mapper>

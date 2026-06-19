@@ -1,11 +1,15 @@
 package com.ruoyi.system.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.ruoyi.system.mapper.TIngredientMapper;
+import com.ruoyi.system.mapper.TInventoryMapper;
 import com.ruoyi.system.domain.TIngredient;
+import com.ruoyi.system.domain.TInventory;
 import com.ruoyi.system.service.ITIngredientService;
 
 /**
@@ -19,6 +23,9 @@ public class TIngredientServiceImpl implements ITIngredientService
 {
     @Autowired
     private TIngredientMapper tIngredientMapper;
+
+    @Autowired
+    private TInventoryMapper tInventoryMapper;
 
     /**
      * 查询食材档案
@@ -51,10 +58,19 @@ public class TIngredientServiceImpl implements ITIngredientService
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertTIngredient(TIngredient tIngredient)
     {
         tIngredient.setCreateTime(DateUtils.getNowDate());
-        return tIngredientMapper.insertTIngredient(tIngredient);
+        int rows = tIngredientMapper.insertTIngredient(tIngredient);
+        // 新增食材后自动初始化库存记录（库存量为0）
+        TInventory inventory = new TInventory();
+        inventory.setIngredientId(tIngredient.getIngredientId());
+        inventory.setStock(BigDecimal.ZERO);
+        inventory.setCreateBy(tIngredient.getCreateBy());
+        inventory.setCreateTime(DateUtils.getNowDate());
+        tInventoryMapper.insertTInventory(inventory);
+        return rows;
     }
 
     /**

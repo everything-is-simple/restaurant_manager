@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TOrderItemMapper">
+    
+    <resultMap type="TOrderItem" id="TOrderItemResult">
+        <result property="orderItemId"    column="order_item_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="dishId"    column="dish_id"    />
+        <result property="dishName"    column="dish_name"    />
+        <result property="price"    column="price"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectTOrderItemVo">
+        select order_item_id, order_id, dish_id, dish_name, price, quantity, create_by, create_time, update_by, update_time, remark from t_order_item
+    </sql>
+
+    <select id="selectTOrderItemList" parameterType="TOrderItem" resultMap="TOrderItemResult">
+        <include refid="selectTOrderItemVo"/>
+        <where>  
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="dishId != null "> and dish_id = #{dishId}</if>
+        </where>
+    </select>
+    
+    <select id="selectTOrderItemByOrderId" parameterType="Long" resultMap="TOrderItemResult">
+        <include refid="selectTOrderItemVo"/>
+        where order_id = #{orderId}
+    </select>
+
+    <insert id="insertTOrderItem" parameterType="TOrderItem" useGeneratedKeys="true" keyProperty="orderItemId">
+        insert into t_order_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">order_id,</if>
+            <if test="dishId != null">dish_id,</if>
+            <if test="dishName != null and dishName != ''">dish_name,</if>
+            <if test="price != null">price,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">#{orderId},</if>
+            <if test="dishId != null">#{dishId},</if>
+            <if test="dishName != null and dishName != ''">#{dishName},</if>
+            <if test="price != null">#{price},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <insert id="batchInsertTOrderItem" parameterType="java.util.List">
+        insert into t_order_item (order_id, dish_id, dish_name, price, quantity, create_by, create_time)
+        values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.orderId}, #{item.dishId}, #{item.dishName}, #{item.price}, #{item.quantity}, #{item.createBy}, #{item.createTime})
+        </foreach>
+    </insert>
+
+    <delete id="deleteTOrderItemByOrderId" parameterType="Long">
+        delete from t_order_item where order_id = #{orderId}
+    </delete>
+</mapper>
