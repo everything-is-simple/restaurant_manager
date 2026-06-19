@@ -20,12 +20,12 @@
 |---|---|
 | Controller | `RuoYi-Vue/ruoyi-admin/src/main/java/com/ruoyi/web/controller/restaurant/` |
 | Domain / Mapper / Service | `RuoYi-Vue/ruoyi-system/src/main/java/com/ruoyi/system/` |
-| Mapper XML | `RuoYi-Vue/ruoyi-system/src/main/resources/mapper/system/` |
+| Mapper XML | `RuoYi-Vue/ruoyi-system/src/main/resources/mapper/restaurant/` |
 | 前端页面 | `RuoYi-Vue/ruoyi-ui/src/views/restaurant/<模块>/index.vue` |
 | 前端 API | `RuoYi-Vue/ruoyi-ui/src/api/restaurant/<模块>.js` |
 
-当前 6 个已生成 CRUD 模块：`category`、`dish`、`ingredient`、`inventory`、`order`、`stockIn`。  
-`T_dish_ingredient` 和 `t_order_item` 表已落库但尚无 Domain/Mapper/Service（扣库存链路依赖它们）。
+当前 6 个已生成 CRUD 模块：`category`、`dish`、`ingredient`、`inventory`、`order`、`stockIn`。
+D5 手写模块：`TDishIngredient`（菜品配方）和 `TOrderItem`（订单明细）的全套 Domain/Mapper/Service/XML 已完成；`TRecipeController`（配方管理）为手写 Controller，非生成器产物。
 
 ## 构建、运行、验证命令
 

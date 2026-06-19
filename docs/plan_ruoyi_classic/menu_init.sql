@@ -83,6 +83,14 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 (2051, '库存查询', 2050, 1, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:inventory:query',   '#', 'admin', NOW(), ''),
 (2052, '入库登记', 2050, 2, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:inventory:stockin', '#', 'admin', NOW(), '');
 
+-- 入库管理按钮（TStockInController 生成器默认权限）
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) VALUES
+(2053, '入库查询', 2050, 3, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:query',   '#', 'admin', NOW(), ''),
+(2054, '入库新增', 2050, 4, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:add',     '#', 'admin', NOW(), ''),
+(2055, '入库修改', 2050, 5, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:edit',    '#', 'admin', NOW(), ''),
+(2056, '入库删除', 2050, 6, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:remove',  '#', 'admin', NOW(), ''),
+(2057, '入库导出', 2050, 7, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:export',  '#', 'admin', NOW(), '');
+
 -- 菜品配方按钮
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) VALUES
 (2061, '配方查询', 2060, 1, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:recipe:query', '#', 'admin', NOW(), ''),
@@ -132,7 +140,8 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
 (101, 2040),  -- 食材档案
 (101, 2041), (101, 2042), (101, 2043), (101, 2044),  -- 食材按钮
 (101, 2050),  -- 库存管理
-(101, 2051), (101, 2052);  -- 库存按钮（查询 + 入库登记）
+(101, 2051), (101, 2052),  -- 库存按钮（查询 + 入库登记）
+(101, 2053), (101, 2054), (101, 2055), (101, 2056), (101, 2057);  -- 入库管理按钮（TStockInController）
 
 -- ============================================================
 -- 6. 测试用户
@@ -160,7 +169,7 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
 (1, 2020), (1, 2021), (1, 2022), (1, 2023), (1, 2024),  -- 菜品分类
 (1, 2030), (1, 2031), (1, 2032), (1, 2033), (1, 2034), (1, 2035),  -- 菜品
 (1, 2040), (1, 2041), (1, 2042), (1, 2043), (1, 2044),  -- 食材
-(1, 2050), (1, 2051), (1, 2052),  -- 库存
+(1, 2050), (1, 2051), (1, 2052), (1, 2053), (1, 2054), (1, 2055), (1, 2056), (1, 2057),  -- 库存
 (1, 2060), (1, 2061), (1, 2062),  -- 配方
 (1, 2070), (1, 2071), (1, 2072), (1, 2073), (1, 2074), (1, 2075);  -- 订单
 

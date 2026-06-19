@@ -73,8 +73,13 @@
 |----------|----------|----------|
 | 库存查询 | `restaurant:inventory:query` | ADMIN、MANAGER、STOCK_KEEPER |
 | 入库登记 | `restaurant:inventory:stockin` | ADMIN、STOCK_KEEPER |
+| 入库查询 | `restaurant:stockIn:query` | ADMIN、STOCK_KEEPER |
+| 入库新增 | `restaurant:stockIn:add` | ADMIN、STOCK_KEEPER |
+| 入库修改 | `restaurant:stockIn:edit` | ADMIN、STOCK_KEEPER |
+| 入库删除 | `restaurant:stockIn:remove` | ADMIN、STOCK_KEEPER |
+| 入库导出 | `restaurant:stockIn:export` | ADMIN、STOCK_KEEPER |
 
-说明：不创建"新增库存""删除库存"按钮，库存由"新增食材自动初始化"和"入库"驱动。
+说明：不创建"新增库存""删除库存"按钮，库存由"新增食材自动初始化"和"入库"驱动。`restaurant:stockIn:*` 为 TStockInController 生成器默认权限。
 
 ### 5.5 菜品配方
 
@@ -119,7 +124,7 @@
 ### 6.3 STOCK_KEEPER（库管员）
 
 - 食材档案、库存管理
-- 按钮：食材增删改查 + 入库登记
+- 按钮：食材增删改查 + 入库登记 + 入库管理 CRUD（TStockInController）
 - 不分配：菜品/配方/订单/看板
 
 ## 7. 权限矩阵（与 03_Design 一致）
@@ -143,7 +148,7 @@
 | 分类 | `restaurant:category` |
 | 菜品 | `restaurant:dish` |
 | 食材 | `restaurant:ingredient` |
-| 库存 | `restaurant:inventory` |
+| 库存 | `restaurant:inventory` + `restaurant:stockIn` |
 | 配方 | `restaurant:recipe` |
 | 订单 | `restaurant:order` |
 | 看板 | `restaurant:stats` |
