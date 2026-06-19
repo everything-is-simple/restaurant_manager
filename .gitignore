@@ -5,7 +5,7 @@
 .vscode/
 
 # Build outputs
-RuoYi-Vue/**/target/
+**/target/
 RuoYi-Vue/ruoyi-ui/node_modules/
 RuoYi-Vue/ruoyi-ui/dist/
 
