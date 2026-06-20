@@ -54,7 +54,7 @@ public interface TOrderItemMapper
     public int deleteTOrderItemByOrderId(Long orderId);
 
     /**
-     * 销量 TopN 统计：按菜品分组，关联 t_order 仅取已完成订单（status=2）
+     * 销量 TopN 统计：按 dish_id 聚合，关联 t_order 仅取已完成订单（status=2）
      * 返回字段：dish_id, dish_name, total_quantity(份数合计), total_amount(销售金额合计)
      * 按 total_quantity 降序
      *

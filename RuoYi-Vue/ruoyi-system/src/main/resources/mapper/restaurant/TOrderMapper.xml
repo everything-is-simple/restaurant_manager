@@ -120,26 +120,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
-    <!-- 统计指定日期已完成订单的营收总额（仅 status=2） -->
+    <!-- 统计指定日期已完成订单的营收总额（按 complete_time 统计，仅 status=2） -->
     <select id="sumRevenueByDay" resultType="java.math.BigDecimal">
         select IFNULL(SUM(total_amount), 0) from t_order
-        where status = 2 and DATE(order_time) = DATE(#{day})
+        where status = 2 and complete_time is not null and DATE(complete_time) = DATE(#{day})
     </select>
 
-    <!-- 统计指定日期已完成订单数（仅 status=2） -->
+    <!-- 统计指定日期已完成订单数（按 complete_time 统计，仅 status=2） -->
     <select id="countCompletedOrdersByDay" resultType="int">
         select COUNT(*) from t_order
-        where status = 2 and DATE(order_time) = DATE(#{day})
+        where status = 2 and complete_time is not null and DATE(complete_time) = DATE(#{day})
     </select>
 
-    <!-- 统计日期区间内每日已完成订单的营收（按天 GROUP BY，仅 status=2） -->
+    <!-- 统计日期区间内每日已完成订单的营收（按 complete_time 分组，仅 status=2） -->
     <select id="sumRevenueGroupByDay" resultType="java.util.Map">
-        select DATE_FORMAT(order_time, '%Y-%m-%d') as date,
+        select DATE_FORMAT(complete_time, '%Y-%m-%d') as date,
                IFNULL(SUM(total_amount), 0) as amount
         from t_order
         where status = 2
-          and DATE(order_time) between DATE(#{beginDate}) and DATE(#{endDate})
-        group by DATE_FORMAT(order_time, '%Y-%m-%d')
-        order by DATE_FORMAT(order_time, '%Y-%m-%d') asc
+          and complete_time is not null
+          and DATE(complete_time) between DATE(#{beginDate}) and DATE(#{endDate})
+        group by DATE_FORMAT(complete_time, '%Y-%m-%d')
+        order by DATE_FORMAT(complete_time, '%Y-%m-%d') asc
     </select>
 </mapper>

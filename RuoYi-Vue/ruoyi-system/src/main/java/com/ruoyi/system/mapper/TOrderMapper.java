@@ -64,16 +64,16 @@ public interface TOrderMapper
     public int deleteTOrderByOrderIds(Long[] orderIds);
 
     /**
-     * 统计指定日期的已完成订单总额（按 order_time 的 DATE 部分匹配）
+     * 统计指定日期的已完成订单总额（按 complete_time 的 DATE 部分匹配）
      * 仅统计 status=2（已完成）的订单
      *
-     * @param day 统计日期（按 DATE(order_time) = #{day}）
+     * @param day 统计日期（按 DATE(complete_time) = #{day}）
      * @return 营收总额（无数据返回 0）
      */
     public BigDecimal sumRevenueByDay(@Param("day") Date day);
 
     /**
-     * 统计指定日期的已完成订单数（按 order_time 的 DATE 部分匹配）
+     * 统计指定日期的已完成订单数（按 complete_time 的 DATE 部分匹配）
      * 仅统计 status=2（已完成）的订单
      *
      * @param day 统计日期
@@ -82,7 +82,7 @@ public interface TOrderMapper
     public int countCompletedOrdersByDay(@Param("day") Date day);
 
     /**
-     * 统计日期区间内每日已完成订单的营收（按天 GROUP BY）
+     * 统计日期区间内每日已完成订单的营收（按 complete_time 天维度 GROUP BY）
      * 返回结果按天升序，key=date(yyyy-MM-dd), value=amount
      * 仅统计 status=2 的订单
      *

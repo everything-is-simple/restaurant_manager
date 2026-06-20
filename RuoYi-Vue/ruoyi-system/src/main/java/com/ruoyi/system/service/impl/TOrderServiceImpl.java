@@ -11,10 +11,12 @@ import com.ruoyi.common.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ruoyi.system.mapper.TDishMapper;
 import com.ruoyi.system.mapper.TOrderMapper;
 import com.ruoyi.system.mapper.TOrderItemMapper;
 import com.ruoyi.system.mapper.TDishIngredientMapper;
 import com.ruoyi.system.mapper.TInventoryMapper;
+import com.ruoyi.system.domain.TDish;
 import com.ruoyi.system.domain.TOrder;
 import com.ruoyi.system.domain.TOrderItem;
 import com.ruoyi.system.domain.TDishIngredient;
@@ -34,6 +36,9 @@ public class TOrderServiceImpl implements ITOrderService
 
     @Autowired
     private TOrderItemMapper tOrderItemMapper;
+
+    @Autowired
+    private TDishMapper tDishMapper;
 
     @Autowired
     private TDishIngredientMapper tDishIngredientMapper;
@@ -141,7 +146,29 @@ public class TOrderServiceImpl implements ITOrderService
         BigDecimal total = BigDecimal.ZERO;
         for (TOrderItem item : items)
         {
-            BigDecimal lineTotal = item.getPrice().multiply(new BigDecimal(item.getQuantity()));
+            if (item.getDishId() == null)
+            {
+                throw new ServiceException("菜品不能为空");
+            }
+            if (item.getQuantity() == null || item.getQuantity() < 1)
+            {
+                throw new ServiceException("菜品份数必须大于 0");
+            }
+
+            TDish dish = tDishMapper.selectTDishByDishId(item.getDishId());
+            if (dish == null || !"0".equals(dish.getDelFlag()))
+            {
+                throw new ServiceException("菜品不存在或已删除，dishId=" + item.getDishId());
+            }
+            if (!"0".equals(dish.getStatus()))
+            {
+                throw new ServiceException("菜品[" + dish.getName() + "]已下架，无法下单");
+            }
+
+            item.setDishName(dish.getName());
+            item.setPrice(dish.getPrice());
+
+            BigDecimal lineTotal = dish.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             total = total.add(lineTotal);
         }
         tOrder.setTotalAmount(total);
