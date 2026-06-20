@@ -53,9 +53,16 @@ public interface TDishMapper
 
     /**
      * 批量删除菜品
-     * 
-     * @param dishIds 需要删除的数据主键集合
+     *
+     * @param dishIds 需要删除的菜品主键集合
      * @return 结果
      */
     public int deleteTDishByDishIds(Long[] dishIds);
+
+    /**
+     * 统计在售菜品数（status=0 且未删除）
+     *
+     * @return 在售菜品数
+     */
+    public int countOnSaleDishes();
 }

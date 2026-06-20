@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="ingredientId"    column="ingredient_id"    />
         <result property="stock"    column="stock"    />
         <result property="ingredientName"    column="ingredient_name"    />
+        <result property="unit"    column="unit"    />
         <result property="safetyStock"    column="safety_stock"    />
         <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
@@ -20,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <sql id="selectTInventoryVo">
         select i.inventory_id, i.ingredient_id, i.stock, i.del_flag, i.create_by, i.create_time, i.update_by, i.update_time, i.remark,
-               ing.name as ingredient_name, ing.safety_stock
+               ing.name as ingredient_name, ing.unit, ing.safety_stock
         from t_inventory i
         left join t_ingredient ing on i.ingredient_id = ing.ingredient_id
     </sql>
@@ -100,4 +101,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update t_inventory set stock = stock + #{addQty}
         where ingredient_id = #{ingredientId}
     </update>
+
+    <!-- 库存预警列表：当前库存 < 安全库存 -->
+    <select id="selectWarningList" resultMap="TInventoryResult">
+        <include refid="selectTInventoryVo"/>
+        where i.del_flag = '0'
+          and ing.del_flag = '0'
+          and ing.safety_stock > 0
+          and i.stock &lt; ing.safety_stock
+        order by (ing.safety_stock - i.stock) desc
+    </select>
+
+    <!-- 库存预警条数 -->
+    <select id="countWarning" resultType="int">
+        select COUNT(*)
+        from t_inventory i
+        inner join t_ingredient ing on i.ingredient_id = ing.ingredient_id
+        where i.del_flag = '0'
+          and ing.del_flag = '0'
+          and ing.safety_stock > 0
+          and i.stock &lt; ing.safety_stock
+    </select>
 </mapper>

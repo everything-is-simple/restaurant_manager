@@ -92,9 +92,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTDishByDishIds" parameterType="String">
-        delete from t_dish where dish_id in 
+        delete from t_dish where dish_id in
         <foreach item="dishId" collection="array" open="(" separator="," close=")">
             #{dishId}
         </foreach>
     </delete>
+
+    <!-- 统计在售菜品数（status=0 且未删除） -->
+    <select id="countOnSaleDishes" resultType="int">
+        select COUNT(*) from t_dish
+        where status = '0' and del_flag = '0'
+    </select>
 </mapper>

@@ -74,4 +74,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteTOrderItemByOrderId" parameterType="Long">
         delete from t_order_item where order_id = #{orderId}
     </delete>
+
+    <!-- 销量 TopN：按菜品分组汇总已完成订单的份数与金额 -->
+    <select id="sumQuantityGroupByDish" resultType="java.util.Map">
+        select i.dish_id                       as dishId,
+               i.dish_name                     as dishName,
+               IFNULL(SUM(i.quantity), 0)      as totalQuantity,
+               IFNULL(SUM(i.price * i.quantity), 0) as totalAmount
+        from t_order_item i
+        inner join t_order o on o.order_id = i.order_id
+        where o.status = 2
+        group by i.dish_id, i.dish_name
+        order by totalQuantity desc
+        limit #{limit}
+    </select>
 </mapper>

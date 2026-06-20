@@ -1,8 +1,10 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
-import com.ruoyi.system.domain.TInventory;
+
 import org.apache.ibatis.annotations.Param;
+
+import com.ruoyi.system.domain.TInventory;
 
 /**
  * 食材库存Mapper接口
@@ -78,4 +80,19 @@ public interface TInventoryMapper
      * @return 受影响行数
      */
     public int addStock(@Param("ingredientId") Long ingredientId, @Param("addQty") java.math.BigDecimal addQty);
+
+    /**
+     * 查询库存预警列表（stock < safety_stock）
+     * 仅返回未删除的食材与库存记录
+     *
+     * @return 预警列表（带 ingredient_name/unit）
+     */
+    public List<TInventory> selectWarningList();
+
+    /**
+     * 统计库存预警条数（stock < safety_stock）
+     *
+     * @return 预警条数
+     */
+    public int countWarning();
 }

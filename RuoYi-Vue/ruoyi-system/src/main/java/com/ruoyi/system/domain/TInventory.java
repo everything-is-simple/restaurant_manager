@@ -32,6 +32,9 @@ public class TInventory extends BaseEntity
     /** 食材名称（非持久化，关联 t_ingredient） */
     private String ingredientName;
 
+    /** 食材单位（非持久化，关联 t_ingredient） */
+    private String unit;
+
     /** 安全库存量（非持久化，关联 t_ingredient） */
     private BigDecimal safetyStock;
 
@@ -72,10 +75,18 @@ public class TInventory extends BaseEntity
     {
         this.ingredientName = ingredientName;
     }
-
     public String getIngredientName()
     {
         return ingredientName;
+    }
+
+    public void setUnit(String unit)
+    {
+        this.unit = unit;
+    }
+    public String getUnit()
+    {
+        return unit;
     }
 
     public void setSafetyStock(BigDecimal safetyStock)
@@ -105,6 +116,7 @@ public class TInventory extends BaseEntity
             .append("ingredientId", getIngredientId())
             .append("stock", getStock())
             .append("ingredientName", getIngredientName())
+            .append("unit", getUnit())
             .append("safetyStock", getSafetyStock())
             .append("delFlag", getDelFlag())
             .append("createBy", getCreateBy())
