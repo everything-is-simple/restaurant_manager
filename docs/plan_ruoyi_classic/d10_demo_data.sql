@@ -1,163 +1,14 @@
--- 文瀛餐厅管理系统业务表
--- 在若依数据库 ry-vue 中执行
--- 适配若依代码生成器：主键 xxx_id、审计字段 create_by/create_time/update_by/update_time/remark、逻辑删除 del_flag
+-- ============================================================
+-- 文瀛餐厅管理系统 — D10 演示数据
+-- 描述: 56 道菜品 / 38 种食材 / 配方 / 库存 / 近 7 天约 200 单已完成订单
+-- 适用: RuoYi-Vue ry-vue 数据库
+-- 执行: Get-Content d10_demo_data.sql -Raw | mysql -uroot -proot ry-vue
+-- ============================================================
 
 USE `ry-vue`;
 
-DROP TABLE IF EXISTS t_order_item;
-DROP TABLE IF EXISTS t_order;
-DROP TABLE IF EXISTS t_stock_in;
-DROP TABLE IF EXISTS t_inventory;
-DROP TABLE IF EXISTS t_dish_ingredient;
-DROP TABLE IF EXISTS t_ingredient;
-DROP TABLE IF EXISTS t_dish;
-DROP TABLE IF EXISTS t_category;
+START TRANSACTION;
 
--- ----------------------------
--- 菜品分类
--- ----------------------------
-CREATE TABLE t_category (
-  category_id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '分类ID',
-  name        VARCHAR(50)  NOT NULL              COMMENT '分类名称',
-  sort        INT          NOT NULL DEFAULT 0    COMMENT '显示顺序',
-  status      CHAR(1)      NOT NULL DEFAULT '0'  COMMENT '状态（0正常 1停用）',
-  del_flag    CHAR(1)      NOT NULL DEFAULT '0'  COMMENT '删除标志（0正常 2删除）',
-  create_by   VARCHAR(64)  DEFAULT ''            COMMENT '创建者',
-  create_time DATETIME     DEFAULT NULL          COMMENT '创建时间',
-  update_by   VARCHAR(64)  DEFAULT ''            COMMENT '更新者',
-  update_time DATETIME     DEFAULT NULL          COMMENT '更新时间',
-  remark      VARCHAR(500) DEFAULT NULL          COMMENT '备注'
-) ENGINE=InnoDB COMMENT='菜品分类';
-
--- ----------------------------
--- 菜品
--- ----------------------------
-CREATE TABLE t_dish (
-  dish_id     BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '菜品ID',
-  name        VARCHAR(100) NOT NULL              COMMENT '菜品名称',
-  category_id BIGINT       NOT NULL              COMMENT '分类ID',
-  price       DECIMAL(10,2) NOT NULL             COMMENT '售价',
-  description VARCHAR(500) DEFAULT NULL          COMMENT '描述',
-  status      CHAR(1)      NOT NULL DEFAULT '0'  COMMENT '状态（0上架 1下架）',
-  del_flag    CHAR(1)      NOT NULL DEFAULT '0'  COMMENT '删除标志（0正常 2删除）',
-  create_by   VARCHAR(64)  DEFAULT ''            COMMENT '创建者',
-  create_time DATETIME     DEFAULT NULL          COMMENT '创建时间',
-  update_by   VARCHAR(64)  DEFAULT ''            COMMENT '更新者',
-  update_time DATETIME     DEFAULT NULL          COMMENT '更新时间',
-  remark      VARCHAR(500) DEFAULT NULL          COMMENT '备注'
-) ENGINE=InnoDB COMMENT='菜品';
-
--- ----------------------------
--- 食材档案
--- ----------------------------
-CREATE TABLE t_ingredient (
-  ingredient_id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '食材ID',
-  name          VARCHAR(100) NOT NULL              COMMENT '食材名称',
-  unit          VARCHAR(20)  NOT NULL              COMMENT '单位',
-  safety_stock  DECIMAL(10,2) NOT NULL DEFAULT 0   COMMENT '安全库存量',
-  status        CHAR(1)      NOT NULL DEFAULT '0'  COMMENT '状态（0正常 1停用）',
-  del_flag      CHAR(1)      NOT NULL DEFAULT '0'  COMMENT '删除标志（0正常 2删除）',
-  create_by     VARCHAR(64)  DEFAULT ''            COMMENT '创建者',
-  create_time   DATETIME     DEFAULT NULL          COMMENT '创建时间',
-  update_by     VARCHAR(64)  DEFAULT ''            COMMENT '更新者',
-  update_time   DATETIME     DEFAULT NULL          COMMENT '更新时间',
-  remark        VARCHAR(500) DEFAULT NULL          COMMENT '备注'
-) ENGINE=InnoDB COMMENT='食材档案';
-
--- ----------------------------
--- 菜品配方（菜品与食材多对多）
--- ----------------------------
-CREATE TABLE t_dish_ingredient (
-  dish_ingredient_id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '配方ID',
-  dish_id            BIGINT        NOT NULL             COMMENT '菜品ID',
-  ingredient_id      BIGINT        NOT NULL             COMMENT '食材ID',
-  quantity           DECIMAL(10,3) NOT NULL             COMMENT '单份消耗量',
-  UNIQUE KEY uk_dish_ingredient (dish_id, ingredient_id),
-  create_by   VARCHAR(64)  DEFAULT ''                  COMMENT '创建者',
-  create_time DATETIME     DEFAULT NULL                 COMMENT '创建时间',
-  update_by   VARCHAR(64)  DEFAULT ''                  COMMENT '更新者',
-  update_time DATETIME     DEFAULT NULL                 COMMENT '更新时间',
-  remark      VARCHAR(500) DEFAULT NULL                 COMMENT '备注'
-) ENGINE=InnoDB COMMENT='菜品配方';
-
--- ----------------------------
--- 食材库存（与食材一对一）
--- ----------------------------
-CREATE TABLE t_inventory (
-  inventory_id  BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '库存ID',
-  ingredient_id BIGINT       NOT NULL UNIQUE       COMMENT '食材ID',
-  stock         DECIMAL(10,2) NOT NULL DEFAULT 0   COMMENT '当前库存量',
-  del_flag      CHAR(1)      NOT NULL DEFAULT '0'  COMMENT '删除标志（0正常 2删除）',
-  create_by     VARCHAR(64)  DEFAULT ''            COMMENT '创建者',
-  create_time   DATETIME     DEFAULT NULL          COMMENT '创建时间',
-  update_by     VARCHAR(64)  DEFAULT ''            COMMENT '更新者',
-  update_time   DATETIME     DEFAULT NULL          COMMENT '更新时间',
-  remark        VARCHAR(500) DEFAULT NULL          COMMENT '备注'
-) ENGINE=InnoDB COMMENT='食材库存';
-
--- ----------------------------
--- 入库记录
--- ----------------------------
-CREATE TABLE t_stock_in (
-  stock_in_id   BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '入库ID',
-  ingredient_id BIGINT        NOT NULL             COMMENT '食材ID',
-  quantity      DECIMAL(10,2) NOT NULL             COMMENT '入库数量',
-  unit_price    DECIMAL(10,2) DEFAULT NULL         COMMENT '采购单价',
-  in_time       DATETIME      DEFAULT NULL         COMMENT '入库时间',
-  del_flag      CHAR(1)       NOT NULL DEFAULT '0' COMMENT '删除标志（0正常 2删除）',
-  create_by     VARCHAR(64)   DEFAULT ''           COMMENT '创建者',
-  create_time   DATETIME      DEFAULT NULL         COMMENT '创建时间',
-  update_by     VARCHAR(64)   DEFAULT ''           COMMENT '更新者',
-  update_time   DATETIME      DEFAULT NULL         COMMENT '更新时间',
-  remark        VARCHAR(500)  DEFAULT NULL         COMMENT '备注'
-) ENGINE=InnoDB COMMENT='入库记录';
-
--- ----------------------------
--- 订单主表
--- ----------------------------
-CREATE TABLE t_order (
-  order_id      BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '订单ID',
-  order_no      VARCHAR(50)  NOT NULL UNIQUE       COMMENT '订单号',
-  total_amount  DECIMAL(10,2) NOT NULL             COMMENT '订单总额',
-  status        TINYINT      NOT NULL DEFAULT 1    COMMENT '订单状态（1已下单 2已完成 3已退单）',
-  order_time    DATETIME     DEFAULT NULL          COMMENT '下单时间',
-  complete_time DATETIME     DEFAULT NULL          COMMENT '完成时间',
-  del_flag      CHAR(1)      NOT NULL DEFAULT '0'  COMMENT '删除标志（0正常 2删除）',
-  create_by     VARCHAR(64)  DEFAULT ''            COMMENT '创建者',
-  create_time   DATETIME     DEFAULT NULL          COMMENT '创建时间',
-  update_by     VARCHAR(64)  DEFAULT ''            COMMENT '更新者',
-  update_time   DATETIME     DEFAULT NULL          COMMENT '更新时间',
-  remark        VARCHAR(500) DEFAULT NULL          COMMENT '备注',
-  INDEX idx_time (order_time),
-  INDEX idx_status (status)
-) ENGINE=InnoDB COMMENT='订单';
-
--- ----------------------------
--- 订单明细
--- ----------------------------
-CREATE TABLE t_order_item (
-  order_item_id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '明细ID',
-  order_id      BIGINT        NOT NULL             COMMENT '订单ID',
-  dish_id       BIGINT        NOT NULL             COMMENT '菜品ID',
-  dish_name     VARCHAR(100)  NOT NULL             COMMENT '菜品名快照',
-  price         DECIMAL(10,2) NOT NULL             COMMENT '成交单价快照',
-  quantity      INT           NOT NULL             COMMENT '份数',
-  create_by     VARCHAR(64)   DEFAULT ''           COMMENT '创建者',
-  create_time   DATETIME      DEFAULT NULL         COMMENT '创建时间',
-  update_by     VARCHAR(64)   DEFAULT ''           COMMENT '更新者',
-  update_time   DATETIME      DEFAULT NULL         COMMENT '更新时间',
-  remark        VARCHAR(500)  DEFAULT NULL         COMMENT '备注',
-  INDEX idx_order (order_id),
-  INDEX idx_dish (dish_id)
-) ENGINE=InnoDB COMMENT='订单明细';
-
--- ============================
--- 演示数据
--- ============================
-
--- ============================================================
--- 文瀛餐厅管理系统 — D10 演示数据
--- ============================================================
 -- 清理历史业务数据并重置自增 ID（保留字典、菜单、角色、用户）
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE t_order_item;
@@ -169,6 +20,7 @@ TRUNCATE TABLE t_ingredient;
 TRUNCATE TABLE t_dish;
 TRUNCATE TABLE t_category;
 SET FOREIGN_KEY_CHECKS = 1;
+
 -- ----------------------------
 -- 菜品分类
 -- ----------------------------
@@ -181,6 +33,7 @@ INSERT INTO t_category(name, sort) VALUES
 ('主食面点', 6),
 ('凉菜', 7),
 ('饮品甜品', 8);
+
 -- ----------------------------
 -- 食材档案
 -- ----------------------------
@@ -221,6 +74,7 @@ INSERT INTO t_ingredient(name, unit, safety_stock, status, create_by, create_tim
 ('面条', 'kg', 0.00, '0', 'admin', NOW()),
 ('粉条', 'kg', 0.00, '0', 'admin', NOW()),
 ('玉米', 'kg', 0.00, '0', 'admin', NOW());
+
 -- ----------------------------
 -- 菜品
 -- ----------------------------
@@ -281,6 +135,7 @@ INSERT INTO t_dish(name, category_id, price, status, create_by, create_time) VAL
 ('牛奶', 8, 3.00, '0', 'admin', NOW()),
 ('小米粥', 8, 2.00, '0', 'admin', NOW()),
 ('豆腐脑', 8, 3.00, '0', 'admin', NOW());
+
 -- ----------------------------
 -- 菜品配方
 -- ----------------------------
@@ -395,6 +250,7 @@ INSERT INTO t_dish_ingredient(dish_id, ingredient_id, quantity, create_by, creat
 (54, 11, 0.250, 'admin', NOW()),
 (55, 32, 0.080, 'admin', NOW()),
 (56, 28, 0.250, 'admin', NOW());
+
 -- ----------------------------
 -- 库存初始化（按日耗 * 3 备货，安全库存 = 日耗 * 0.5）
 -- 假设文瀛餐厅午餐到店约 1000 人，56 道菜，热门菜日销 10~200 份
@@ -436,6 +292,7 @@ INSERT INTO t_inventory(ingredient_id, stock, del_flag, create_by, create_time) 
 (34, 120.00, '0', 'admin', NOW()),
 (35, 5.58, '0', 'admin', NOW()),
 (36, 5.28, '0', 'admin', NOW());
+
 -- 初始入库记录（与库存量对应，方便演示入库→库存链路）
 INSERT INTO t_stock_in(ingredient_id, quantity, unit_price, in_time, del_flag, create_by, create_time, remark) VALUES
 (1, 33.66, 17.07, NOW() - INTERVAL 1 DAY, '0', 'admin', NOW(), 'D10 初始备货入库'),
@@ -474,6 +331,7 @@ INSERT INTO t_stock_in(ingredient_id, quantity, unit_price, in_time, del_flag, c
 (34, 120.00, 24.41, NOW() - INTERVAL 1 DAY, '0', 'admin', NOW(), 'D10 初始备货入库'),
 (35, 5.58, 11.33, NOW() - INTERVAL 1 DAY, '0', 'admin', NOW(), 'D10 初始备货入库'),
 (36, 5.28, 15.14, NOW() - INTERVAL 1 DAY, '0', 'admin', NOW(), 'D10 初始备货入库');
+
 -- 更新安全库存
 UPDATE t_ingredient SET safety_stock = 5.61 WHERE ingredient_id = 1;
 UPDATE t_ingredient SET safety_stock = 16.71 WHERE ingredient_id = 2;
@@ -511,6 +369,7 @@ UPDATE t_ingredient SET safety_stock = 0.88 WHERE ingredient_id = 36;
 UPDATE t_ingredient SET safety_stock = 21.93 WHERE ingredient_id = 32;
 UPDATE t_ingredient SET safety_stock = 5.00 WHERE ingredient_id = 30;
 UPDATE t_ingredient SET safety_stock = 7.50 WHERE ingredient_id = 11;
+
 -- ----------------------------
 -- 近 7 天已完成订单（约 200 单，覆盖 56 道菜品）
 -- ----------------------------
@@ -727,6 +586,7 @@ INSERT INTO t_order(order_id, order_no, total_amount, status, order_time, comple
 (210, '20260620104130025', 42.00, 2, '2026-06-20 10:41:30', '2026-06-20 10:55:30', '0', 'admin', '2026-06-20 10:41:30'),
 (211, '20260620101728026', 6.00, 2, '2026-06-20 10:17:28', '2026-06-20 10:36:28', '0', 'admin', '2026-06-20 10:17:28'),
 (212, '20260620105814027', 50.00, 2, '2026-06-20 10:58:14', '2026-06-20 11:15:14', '0', 'admin', '2026-06-20 10:58:14');
+
 INSERT INTO t_order_item(order_item_id, order_id, dish_id, dish_name, price, quantity, create_by, create_time) VALUES
 (1, 1, 13, '刀削面', 12.00, 1, 'admin', NOW()),
 (2, 1, 46, '水饺', 12.00, 1, 'admin', NOW()),
@@ -1144,15 +1004,7 @@ INSERT INTO t_order_item(order_item_id, order_id, dish_id, dish_name, price, qua
 (414, 211, 54, '牛奶', 3.00, 2, 'admin', NOW()),
 (415, 212, 2, '鱼香肉丝', 12.00, 1, 'admin', NOW()),
 (416, 212, 27, '黑椒牛柳', 19.00, 2, 'admin', NOW());
+
+COMMIT;
+
 -- 订单总数: 212, 订单明细总数: 416
-
--- ============================
--- 业务字典：订单状态
--- ============================
-INSERT INTO sys_dict_type (dict_name, dict_type, status, create_by, create_time, remark)
-VALUES ('餐厅订单状态', 'restaurant_order_status', '0', 'admin', NOW(), '文瀛餐厅订单状态字典');
-
-INSERT INTO sys_dict_data (dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, status, create_by, create_time, remark) VALUES
-(1, '已下单', '1', 'restaurant_order_status', '', 'info',    'Y', '0', 'admin', NOW(), '订单已创建，尚未完成'),
-(2, '已完成', '2', 'restaurant_order_status', '', 'success', 'N', '0', 'admin', NOW(), '订单已完成，库存已扣减'),
-(3, '已退单', '3', 'restaurant_order_status', '', 'danger',  'N', '0', 'admin', NOW(), '订单已退单，库存已回滚');

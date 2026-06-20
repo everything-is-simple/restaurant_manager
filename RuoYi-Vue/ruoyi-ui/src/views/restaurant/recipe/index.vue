@@ -78,7 +78,7 @@
 
 <script>
 import { listDish } from '@/api/restaurant/dish'
-import { listIngredient } from '@/api/restaurant/ingredient'
+import { listInventory } from '@/api/restaurant/inventory'
 import { getRecipe, saveRecipe } from '@/api/restaurant/recipe'
 
 export default {
@@ -111,8 +111,18 @@ export default {
       })
     },
     loadIngredients() {
-      listIngredient({ pageNum: 1, pageSize: 1000 }).then(response => {
-        this.ingredientOptions = response.rows || []
+      listInventory({ pageNum: 1, pageSize: 1000 }).then(response => {
+        const rows = response.rows || []
+        const ingredientMap = new Map()
+        rows.forEach(item => {
+          if (item && item.ingredientId && !ingredientMap.has(item.ingredientId)) {
+            ingredientMap.set(item.ingredientId, {
+              ingredientId: item.ingredientId,
+              name: item.ingredientName
+            })
+          }
+        })
+        this.ingredientOptions = Array.from(ingredientMap.values())
       })
     },
     getDishNameById(dishId) {

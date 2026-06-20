@@ -103,7 +103,7 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) VALUES
 (2071, '订单查询', 2070, 1, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:order:query',    '#', 'admin', NOW(), ''),
 (2072, '模拟下单', 2070, 2, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:order:mock',     '#', 'admin', NOW(), ''),
-(2073, '查看详情', 2070, 3, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:order:detail',   '#', 'admin', NOW(), ''),
+(2073, '查看详情', 2070, 3, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:order:query',   '#', 'admin', NOW(), ''),
 (2074, '完成订单', 2070, 4, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:order:complete', '#', 'admin', NOW(), ''),
 (2075, '退单',     2070, 5, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:order:cancel',   '#', 'admin', NOW(), '');
 
