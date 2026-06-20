@@ -10,6 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="quantity"    column="quantity"    />
         <result property="unitPrice"    column="unit_price"    />
         <result property="inTime"    column="in_time"    />
+        <result property="ingredientName"    column="ingredient_name"    />
         <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
@@ -19,22 +20,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectTStockInVo">
-        select stock_in_id, ingredient_id, quantity, unit_price, in_time, del_flag, create_by, create_time, update_by, update_time, remark from t_stock_in
+        select s.stock_in_id, s.ingredient_id, s.quantity, s.unit_price, s.in_time, s.del_flag, s.create_by, s.create_time, s.update_by, s.update_time, s.remark,
+               ing.name as ingredient_name
+        from t_stock_in s
+        left join t_ingredient ing on s.ingredient_id = ing.ingredient_id
     </sql>
 
     <select id="selectTStockInList" parameterType="TStockIn" resultMap="TStockInResult">
         <include refid="selectTStockInVo"/>
         <where>  
-            <if test="ingredientId != null "> and ingredient_id = #{ingredientId}</if>
-            <if test="quantity != null "> and quantity = #{quantity}</if>
-            <if test="unitPrice != null "> and unit_price = #{unitPrice}</if>
-            <if test="inTime != null "> and in_time = #{inTime}</if>
+            <if test="ingredientId != null "> and s.ingredient_id = #{ingredientId}</if>
+            <if test="quantity != null "> and s.quantity = #{quantity}</if>
+            <if test="unitPrice != null "> and s.unit_price = #{unitPrice}</if>
+            <if test="inTime != null "> and DATE(s.in_time) = #{inTime}</if>
+            <if test="ingredientName != null and ingredientName != ''"> and ing.name like concat('%', #{ingredientName}, '%')</if>
         </where>
     </select>
     
     <select id="selectTStockInByStockInId" parameterType="Long" resultMap="TStockInResult">
         <include refid="selectTStockInVo"/>
-        where stock_in_id = #{stockInId}
+        where s.stock_in_id = #{stockInId}
     </select>
 
     <insert id="insertTStockIn" parameterType="TStockIn" useGeneratedKeys="true" keyProperty="stockInId">

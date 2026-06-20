@@ -8,6 +8,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="inventoryId"    column="inventory_id"    />
         <result property="ingredientId"    column="ingredient_id"    />
         <result property="stock"    column="stock"    />
+        <result property="ingredientName"    column="ingredient_name"    />
+        <result property="safetyStock"    column="safety_stock"    />
         <result property="delFlag"    column="del_flag"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
@@ -17,20 +19,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectTInventoryVo">
-        select inventory_id, ingredient_id, stock, del_flag, create_by, create_time, update_by, update_time, remark from t_inventory
+        select i.inventory_id, i.ingredient_id, i.stock, i.del_flag, i.create_by, i.create_time, i.update_by, i.update_time, i.remark,
+               ing.name as ingredient_name, ing.safety_stock
+        from t_inventory i
+        left join t_ingredient ing on i.ingredient_id = ing.ingredient_id
     </sql>
 
     <select id="selectTInventoryList" parameterType="TInventory" resultMap="TInventoryResult">
         <include refid="selectTInventoryVo"/>
         <where>  
-            <if test="ingredientId != null "> and ingredient_id = #{ingredientId}</if>
-            <if test="stock != null "> and stock = #{stock}</if>
+            <if test="ingredientId != null "> and i.ingredient_id = #{ingredientId}</if>
+            <if test="stock != null "> and i.stock = #{stock}</if>
+            <if test="ingredientName != null and ingredientName != ''"> and ing.name like concat('%', #{ingredientName}, '%')</if>
         </where>
     </select>
     
     <select id="selectTInventoryByInventoryId" parameterType="Long" resultMap="TInventoryResult">
         <include refid="selectTInventoryVo"/>
-        where inventory_id = #{inventoryId}
+        where i.inventory_id = #{inventoryId}
     </select>
 
     <insert id="insertTInventory" parameterType="TInventory" useGeneratedKeys="true" keyProperty="inventoryId">

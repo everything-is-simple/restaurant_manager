@@ -9,14 +9,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="订单总额" prop="totalAmount">
-        <el-input
-          v-model="queryParams.totalAmount"
-          placeholder="请输入订单总额"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="订单状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择订单状态" clearable>
           <el-option
@@ -115,18 +107,25 @@
           <dict-tag :options="dict.type.restaurant_order_status" :value="scope.row.status"/>
         </template>
       </el-table-column>
-      <el-table-column label="下单时间" align="center" prop="orderTime" width="180">
+      <el-table-column label="下单时间" align="center" prop="orderTime" width="160">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.orderTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.orderTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="完成时间" align="center" prop="completeTime" width="180">
+      <el-table-column label="完成时间" align="center" prop="completeTime" width="160">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.completeTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.completeTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="300">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleDetail(scope.row)"
+            v-hasPermi="['restaurant:order:query']"
+          >详情</el-button>
           <el-button
             size="mini"
             type="text"
@@ -277,6 +276,58 @@
         <el-button @click="mockOpen = false">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 订单详情对话框 -->
+    <el-dialog title="订单详情" :visible.sync="detailOpen" width="700px" append-to-body>
+      <el-form label-width="100px" class="detail-form">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="订单号：">
+              <span>{{ detailData.orderNo }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="订单状态：">
+              <dict-tag :options="dict.type.restaurant_order_status" :value="detailData.status"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="订单总额：">
+              <span class="amount">¥{{ detailData.totalAmount }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="下单时间：">
+              <span>{{ parseTime(detailData.orderTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" v-if="detailData.completeTime">
+            <el-form-item label="完成时间：">
+              <span>{{ parseTime(detailData.completeTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="备注：">
+              <span>{{ detailData.remark || '-' }}</span>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <h4 class="detail-title">菜品明细</h4>
+      <el-table :data="detailData.orderItems" border size="small">
+        <el-table-column label="菜品" align="center" prop="dishName" />
+        <el-table-column label="单价" align="center" prop="price" />
+        <el-table-column label="份数" align="center" prop="quantity" />
+        <el-table-column label="小计" align="center">
+          <template slot-scope="scope">
+            ¥{{ (scope.row.price * scope.row.quantity).toFixed(2) }}
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="detailOpen = false">关 闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -316,12 +367,15 @@ export default {
         remark: null,
         orderItems: []
       },
+      // 是否显示详情弹窗
+      detailOpen: false,
+      // 订单详情数据
+      detailData: {},
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         orderNo: null,
-        totalAmount: null,
         status: null,
         orderTime: null,
         completeTime: null,
@@ -497,7 +551,11 @@ export default {
       }).then(() => {
         this.$modal.msgSuccess("订单已完成，库存已扣减")
         this.getList()
-      }).catch(() => {})
+      }).catch(err => {
+        if (err !== 'cancel' && err?.msg) {
+          this.$modal.msgError(err.msg)
+        }
+      })
     },
     /** 退单 */
     handleCancel(row) {
@@ -506,8 +564,36 @@ export default {
       }).then(() => {
         this.$modal.msgSuccess("退单成功，库存已回滚")
         this.getList()
-      }).catch(() => {})
+      }).catch(err => {
+        if (err !== 'cancel' && err?.msg) {
+          this.$modal.msgError(err.msg)
+        }
+      })
+    },
+    /** 查看详情 */
+    handleDetail(row) {
+      getOrder(row.orderId).then(response => {
+        this.detailData = response.data
+        this.detailOpen = true
+      })
     }
   }
 }
 </script>
+
+<style scoped>
+.detail-form .el-form-item {
+  margin-bottom: 8px;
+}
+.detail-form .amount {
+  color: #f56c6c;
+  font-weight: bold;
+}
+.detail-title {
+  margin: 16px 0 12px;
+  font-size: 14px;
+  color: #606266;
+  border-left: 4px solid #409eff;
+  padding-left: 8px;
+}
+</style>

@@ -196,3 +196,14 @@ INSERT INTO t_dish_ingredient(dish_id, ingredient_id, quantity) VALUES
 (1, 1, 0.300),
 (3, 4, 0.250),
 (7, 8, 0.100);
+
+-- ============================
+-- 业务字典：订单状态
+-- ============================
+INSERT INTO sys_dict_type (dict_name, dict_type, status, create_by, create_time, remark)
+VALUES ('餐厅订单状态', 'restaurant_order_status', '0', 'admin', NOW(), '文瀛餐厅订单状态字典');
+
+INSERT INTO sys_dict_data (dict_sort, dict_label, dict_value, dict_type, css_class, list_class, is_default, status, create_by, create_time, remark) VALUES
+(1, '已下单', '1', 'restaurant_order_status', '', 'info',    'Y', '0', 'admin', NOW(), '订单已创建，尚未完成'),
+(2, '已完成', '2', 'restaurant_order_status', '', 'success', 'N', '0', 'admin', NOW(), '订单已完成，库存已扣减'),
+(3, '已退单', '3', 'restaurant_order_status', '', 'danger',  'N', '0', 'admin', NOW(), '订单已退单，库存已回滚');

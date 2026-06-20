@@ -37,7 +37,7 @@ public class TStockInController extends BaseController
     /**
      * 查询入库记录列表
      */
-    @PreAuthorize("@ss.hasPermi('restaurant:stockIn:list')")
+    @PreAuthorize("@ss.hasPermi('restaurant:stockIn:query')")
     @GetMapping("/list")
     public TableDataInfo list(TStockIn tStockIn)
     {

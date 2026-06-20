@@ -142,7 +142,7 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="安全库存量" prop="safetyStock">
-              <el-input v-model="form.safetyStock" placeholder="请输入安全库存量" />
+              <el-input-number v-model="form.safetyStock" :min="0" :precision="2" style="width: 100%;" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -154,11 +154,6 @@
                   :label="dict.value"
                 >{{dict.label}}</el-radio>
               </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="删除标志" prop="delFlag">
-              <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -227,9 +222,6 @@ export default {
         status: [
           { required: true, message: "状态不能为空", trigger: "change" }
         ],
-        delFlag: [
-          { required: true, message: "删除标志不能为空", trigger: "blur" }
-        ],
       }
     }
   },
@@ -259,7 +251,6 @@ export default {
         unit: null,
         safetyStock: null,
         status: null,
-        delFlag: null,
         createBy: null,
         createTime: null,
         updateBy: null,

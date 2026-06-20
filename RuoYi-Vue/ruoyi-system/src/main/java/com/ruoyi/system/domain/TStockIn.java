@@ -2,9 +2,11 @@ package com.ruoyi.system.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -24,6 +26,9 @@ public class TStockIn extends BaseEntity
     /** 食材ID */
     @Excel(name = "食材ID")
     private Long ingredientId;
+
+    /** 食材名称（非持久化，关联 t_ingredient） */
+    private String ingredientName;
 
     /** 入库数量 */
     @Excel(name = "入库数量")
@@ -59,6 +64,16 @@ public class TStockIn extends BaseEntity
     public Long getIngredientId() 
     {
         return ingredientId;
+    }
+
+    public void setIngredientName(String ingredientName)
+    {
+        this.ingredientName = ingredientName;
+    }
+
+    public String getIngredientName()
+    {
+        return ingredientName;
     }
 
     public void setQuantity(BigDecimal quantity) 
@@ -106,6 +121,7 @@ public class TStockIn extends BaseEntity
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("stockInId", getStockInId())
             .append("ingredientId", getIngredientId())
+            .append("ingredientName", getIngredientName())
             .append("quantity", getQuantity())
             .append("unitPrice", getUnitPrice())
             .append("inTime", getInTime())

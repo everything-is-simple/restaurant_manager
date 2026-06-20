@@ -1,18 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="食材ID" prop="ingredientId">
+      <el-form-item label="食材" prop="ingredientName">
         <el-input
-          v-model="queryParams.ingredientId"
-          placeholder="请输入食材ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="当前库存量" prop="stock">
-        <el-input
-          v-model="queryParams.stock"
-          placeholder="请输入当前库存量"
+          v-model="queryParams.ingredientName"
+          placeholder="请输入食材名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -72,8 +64,21 @@
     <el-table v-loading="loading" :data="inventoryList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="库存ID" align="center" prop="inventoryId" />
-      <el-table-column label="食材ID" align="center" prop="ingredientId" />
-      <el-table-column label="当前库存量" align="center" prop="stock" />
+      <el-table-column label="食材" align="center" prop="ingredientName" />
+      <el-table-column label="当前库存量" align="center" prop="stock">
+        <template slot-scope="scope">
+          <el-tag :type="isWarning(scope.row) ? 'danger' : 'success'" size="small">
+            {{ scope.row.stock }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="安全库存" align="center" prop="safetyStock" />
+      <el-table-column label="预警状态" align="center" width="100">
+        <template slot-scope="scope">
+          <el-tag v-if="isWarning(scope.row)" type="danger" size="small">库存不足</el-tag>
+          <el-tag v-else type="success" size="small">充足</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -107,18 +112,20 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="24">
-            <el-form-item label="食材ID" prop="ingredientId">
-              <el-input v-model="form.ingredientId" placeholder="请输入食材ID" />
+            <el-form-item label="食材" prop="ingredientId">
+              <el-select v-model="form.ingredientId" placeholder="请选择食材" style="width: 100%;">
+                <el-option
+                  v-for="item in ingredientList"
+                  :key="item.ingredientId"
+                  :label="item.name"
+                  :value="item.ingredientId"
+                />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="当前库存量" prop="stock">
-              <el-input v-model="form.stock" placeholder="请输入当前库存量" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="删除标志" prop="delFlag">
-              <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
+              <el-input-number v-model="form.stock" :min="0" :precision="2" style="width: 100%;" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -138,6 +145,7 @@
 
 <script>
 import { listInventory, getInventory, delInventory, addInventory, updateInventory } from "@/api/restaurant/inventory"
+import { listIngredient } from "@/api/restaurant/ingredient"
 
 export default {
   name: "Inventory",
@@ -157,6 +165,8 @@ export default {
       total: 0,
       // 食材库存表格数据
       inventoryList: [],
+      // 食材列表（下拉选择用）
+      ingredientList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -165,27 +175,24 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        ingredientId: null,
-        stock: null,
+        ingredientName: null,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         ingredientId: [
-          { required: true, message: "食材ID不能为空", trigger: "blur" }
+          { required: true, message: "食材不能为空", trigger: "change" }
         ],
         stock: [
           { required: true, message: "当前库存量不能为空", trigger: "blur" }
-        ],
-        delFlag: [
-          { required: true, message: "删除标志不能为空", trigger: "blur" }
         ],
       }
     }
   },
   created() {
     this.getList()
+    this.getIngredientList()
   },
   methods: {
     /** 查询食材库存列表 */
@@ -196,6 +203,16 @@ export default {
         this.total = response.total
         this.loading = false
       })
+    },
+    /** 加载食材列表 */
+    getIngredientList() {
+      listIngredient({ pageNum: 1, pageSize: 999, status: '0' }).then(response => {
+        this.ingredientList = response.rows
+      })
+    },
+    /** 判断是否库存预警 */
+    isWarning(row) {
+      return row.safetyStock != null && row.stock != null && Number(row.stock) < Number(row.safetyStock)
     },
     // 取消按钮
     cancel() {
@@ -208,7 +225,6 @@ export default {
         inventoryId: null,
         ingredientId: null,
         stock: null,
-        delFlag: null,
         createBy: null,
         createTime: null,
         updateBy: null,

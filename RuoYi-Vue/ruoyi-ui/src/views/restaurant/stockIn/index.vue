@@ -1,29 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="食材ID" prop="ingredientId">
-        <el-input
-          v-model="queryParams.ingredientId"
-          placeholder="请输入食材ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="入库数量" prop="quantity">
-        <el-input
-          v-model="queryParams.quantity"
-          placeholder="请输入入库数量"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="采购单价" prop="unitPrice">
-        <el-input
-          v-model="queryParams.unitPrice"
-          placeholder="请输入采购单价"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="食材" prop="ingredientId">
+        <el-select v-model="queryParams.ingredientId" placeholder="请选择食材" clearable>
+          <el-option
+            v-for="item in ingredientList"
+            :key="item.ingredientId"
+            :label="item.name"
+            :value="item.ingredientId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="入库时间" prop="inTime">
         <el-date-picker clearable
@@ -88,12 +74,12 @@
     <el-table v-loading="loading" :data="stockInList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="入库ID" align="center" prop="stockInId" />
-      <el-table-column label="食材ID" align="center" prop="ingredientId" />
+      <el-table-column label="食材" align="center" prop="ingredientName" />
       <el-table-column label="入库数量" align="center" prop="quantity" />
       <el-table-column label="采购单价" align="center" prop="unitPrice" />
-      <el-table-column label="入库时间" align="center" prop="inTime" width="180">
+      <el-table-column label="入库时间" align="center" prop="inTime" width="160">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.inTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.inTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -129,33 +115,36 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="24">
-            <el-form-item label="食材ID" prop="ingredientId">
-              <el-input v-model="form.ingredientId" placeholder="请输入食材ID" />
+            <el-form-item label="食材" prop="ingredientId">
+              <el-select v-model="form.ingredientId" placeholder="请选择食材" style="width: 100%;">
+                <el-option
+                  v-for="item in ingredientList"
+                  :key="item.ingredientId"
+                  :label="item.name"
+                  :value="item.ingredientId"
+                />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="入库数量" prop="quantity">
-              <el-input v-model="form.quantity" placeholder="请输入入库数量" />
+              <el-input-number v-model="form.quantity" :min="0.01" :precision="2" style="width: 100%;" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="采购单价" prop="unitPrice">
-              <el-input v-model="form.unitPrice" placeholder="请输入采购单价" />
+              <el-input-number v-model="form.unitPrice" :min="0" :precision="2" style="width: 100%;" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="入库时间" prop="inTime">
               <el-date-picker clearable
                 v-model="form.inTime"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="请选择入库时间">
+                type="datetime"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                placeholder="请选择入库时间"
+                style="width: 100%;">
               </el-date-picker>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="删除标志" prop="delFlag">
-              <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -175,6 +164,7 @@
 
 <script>
 import { listStockIn, getStockIn, delStockIn, addStockIn, updateStockIn } from "@/api/restaurant/stockIn"
+import { listIngredient } from "@/api/restaurant/ingredient"
 
 export default {
   name: "StockIn",
@@ -194,6 +184,8 @@ export default {
       total: 0,
       // 入库记录表格数据
       stockInList: [],
+      // 食材列表（下拉选择用）
+      ingredientList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -203,8 +195,6 @@ export default {
         pageNum: 1,
         pageSize: 10,
         ingredientId: null,
-        quantity: null,
-        unitPrice: null,
         inTime: null,
       },
       // 表单参数
@@ -212,19 +202,17 @@ export default {
       // 表单校验
       rules: {
         ingredientId: [
-          { required: true, message: "食材ID不能为空", trigger: "blur" }
+          { required: true, message: "食材不能为空", trigger: "change" }
         ],
         quantity: [
           { required: true, message: "入库数量不能为空", trigger: "blur" }
-        ],
-        delFlag: [
-          { required: true, message: "删除标志不能为空", trigger: "blur" }
         ],
       }
     }
   },
   created() {
     this.getList()
+    this.getIngredientList()
   },
   methods: {
     /** 查询入库记录列表 */
@@ -234,6 +222,12 @@ export default {
         this.stockInList = response.rows
         this.total = response.total
         this.loading = false
+      })
+    },
+    /** 加载食材列表 */
+    getIngredientList() {
+      listIngredient({ pageNum: 1, pageSize: 999, status: '0' }).then(response => {
+        this.ingredientList = response.rows
       })
     },
     // 取消按钮
@@ -249,7 +243,6 @@ export default {
         quantity: null,
         unitPrice: null,
         inTime: null,
-        delFlag: null,
         createBy: null,
         createTime: null,
         updateBy: null,

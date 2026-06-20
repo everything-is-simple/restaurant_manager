@@ -5,7 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.system.mapper.TOrderMapper">
     
     <resultMap type="TOrder" id="TOrderResult">
-        <result property="orderId"    column="order_id"    />
+        <id property="orderId"    column="order_id"    />
         <result property="orderNo"    column="order_no"    />
         <result property="totalAmount"    column="total_amount"    />
         <result property="status"    column="status"    />
@@ -19,24 +19,46 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark"    column="remark"    />
     </resultMap>
 
+    <resultMap type="TOrder" id="TOrderWithItemsResult" extends="TOrderResult">
+        <collection property="orderItems" ofType="TOrderItem" resultMap="TOrderItemNestedResult"/>
+    </resultMap>
+
+    <resultMap type="TOrderItem" id="TOrderItemNestedResult">
+        <id property="orderItemId" column="order_item_id" />
+        <result property="orderId" column="item_order_id" />
+        <result property="dishId" column="dish_id" />
+        <result property="dishName" column="dish_name" />
+        <result property="price" column="item_price" />
+        <result property="quantity" column="item_quantity" />
+    </resultMap>
+
     <sql id="selectTOrderVo">
         select order_id, order_no, total_amount, status, order_time, complete_time, del_flag, create_by, create_time, update_by, update_time, remark from t_order
+    </sql>
+
+    <sql id="selectTOrderWithItemsVo">
+        select
+            o.order_id, o.order_no, o.total_amount, o.status, o.order_time, o.complete_time, o.del_flag,
+            o.create_by, o.create_time, o.update_by, o.update_time, o.remark,
+            i.order_item_id, i.order_id as item_order_id, i.dish_id, i.dish_name,
+            i.price as item_price, i.quantity as item_quantity
+        from t_order o
+        left join t_order_item i on o.order_id = i.order_id
     </sql>
 
     <select id="selectTOrderList" parameterType="TOrder" resultMap="TOrderResult">
         <include refid="selectTOrderVo"/>
         <where>  
-            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
-            <if test="totalAmount != null "> and total_amount = #{totalAmount}</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no like concat('%', #{orderNo}, '%')</if>
             <if test="status != null "> and status = #{status}</if>
-            <if test="orderTime != null "> and order_time = #{orderTime}</if>
-            <if test="completeTime != null "> and complete_time = #{completeTime}</if>
+            <if test="orderTime != null "> and DATE(order_time) = #{orderTime}</if>
+            <if test="completeTime != null "> and DATE(complete_time) = #{completeTime}</if>
         </where>
     </select>
     
-    <select id="selectTOrderByOrderId" parameterType="Long" resultMap="TOrderResult">
-        <include refid="selectTOrderVo"/>
-        where order_id = #{orderId}
+    <select id="selectTOrderByOrderId" parameterType="Long" resultMap="TOrderWithItemsResult">
+        <include refid="selectTOrderWithItemsVo"/>
+        where o.order_id = #{orderId}
     </select>
 
     <insert id="insertTOrder" parameterType="TOrder" useGeneratedKeys="true" keyProperty="orderId">
