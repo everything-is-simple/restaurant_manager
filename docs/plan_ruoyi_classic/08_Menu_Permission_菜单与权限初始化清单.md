@@ -27,7 +27,7 @@
 
 | 菜单名称 | 路由地址 | 组件路径 | 权限标识 | 图标 | 可见角色 |
 |----------|----------|----------|----------|------|----------|
-| 数据看板 | `stats` | `restaurant/stats/index` | `restaurant:stats:list` | `dashboard` | ADMIN、MANAGER |
+| 数据看板 | `stats` | `restaurant/stats/index` | `restaurant:stats:query` | `dashboard` | ADMIN、MANAGER |
 | 菜品分类 | `category` | `restaurant/category/index` | `restaurant:category:list` | `tree` | ADMIN、MANAGER |
 | 菜品管理 | `dish` | `restaurant/dish/index` | `restaurant:dish:list` | `list` | ADMIN、MANAGER |
 | 食材档案 | `ingredient` | `restaurant/ingredient/index` | `restaurant:ingredient:list` | `edit` | ADMIN、STOCK_KEEPER |

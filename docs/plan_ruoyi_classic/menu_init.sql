@@ -27,7 +27,7 @@ VALUES (2000, '餐厅管理', 0, 5, 'restaurant', NULL, 1, 0, 'M', '0', '0', '',
 -- ============================================================
 -- 数据看板
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-VALUES (2010, '数据看板', 2000, 1, 'stats', 'restaurant/stats/index', 1, 0, 'C', '0', '0', 'restaurant:stats:list', 'dashboard', 'admin', NOW(), '数据看板');
+VALUES (2010, '数据看板', 2000, 1, 'stats', 'restaurant/stats/index', 1, 0, 'C', '0', '0', 'restaurant:stats:query', 'dashboard', 'admin', NOW(), '数据看板');
 
 -- 菜品分类
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
