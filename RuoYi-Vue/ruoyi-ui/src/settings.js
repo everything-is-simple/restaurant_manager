@@ -2,7 +2,7 @@ module.exports = {
   /**
    * 网页标题
    */
-  title: process.env.VUE_APP_TITLE,
+  title: process.env.VUE_APP_TITLE || '文瀛餐厅管理系统',
 
   /**
    * 侧边栏主题 深色主题theme-dark，浅色主题theme-light

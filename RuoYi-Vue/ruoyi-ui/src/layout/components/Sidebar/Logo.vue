@@ -38,7 +38,7 @@ export default {
   },
   data() {
     return {
-      title: process.env.VUE_APP_TITLE,
+      title: process.env.VUE_APP_TITLE || '文瀛餐厅管理系统',
       logo: logoImg
     }
   }
