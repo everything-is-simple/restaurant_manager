@@ -23,7 +23,7 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 VALUES (2000, '餐厅管理', 0, 5, 'restaurant', NULL, 1, 0, 'M', '0', '0', '', 'clipboard', 'admin', NOW(), '餐厅业务目录');
 
 -- ============================================================
--- 2. 7 个页面菜单
+-- 2. 8 个页面菜单
 -- ============================================================
 -- 数据看板
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
@@ -45,13 +45,17 @@ VALUES (2040, '食材档案', 2000, 4, 'ingredient', 'restaurant/ingredient/inde
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
 VALUES (2050, '库存管理', 2000, 5, 'inventory', 'restaurant/inventory/index', 1, 0, 'C', '0', '0', 'restaurant:inventory:list', 'shopping', 'admin', NOW(), '库存管理');
 
+-- 入库管理
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
+VALUES (2052, '入库管理', 2000, 6, 'stockIn', 'restaurant/stockIn/index', 1, 0, 'C', '0', '0', 'restaurant:stockIn:list', 'form', 'admin', NOW(), '入库管理');
+
 -- 菜品配方
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-VALUES (2060, '菜品配方', 2000, 6, 'recipe', 'restaurant/recipe/index', 1, 0, 'C', '0', '0', 'restaurant:recipe:list', 'guide', 'admin', NOW(), '菜品配方');
+VALUES (2060, '菜品配方', 2000, 7, 'recipe', 'restaurant/recipe/index', 1, 0, 'C', '0', '0', 'restaurant:recipe:list', 'guide', 'admin', NOW(), '菜品配方');
 
 -- 订单管理
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-VALUES (2070, '订单管理', 2000, 7, 'order', 'restaurant/order/index', 1, 0, 'C', '0', '0', 'restaurant:order:list', 'order', 'admin', NOW(), '订单管理');
+VALUES (2070, '订单管理', 2000, 8, 'order', 'restaurant/order/index', 1, 0, 'C', '0', '0', 'restaurant:order:list', 'order', 'admin', NOW(), '订单管理');
 
 -- ============================================================
 -- 3. 按钮权限（menu_type='F'）
@@ -80,16 +84,15 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component,
 
 -- 库存管理按钮
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) VALUES
-(2051, '库存查询', 2050, 1, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:inventory:query',   '#', 'admin', NOW(), ''),
-(2052, '入库登记', 2050, 2, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:inventory:stockin', '#', 'admin', NOW(), '');
+(2051, '库存查询', 2050, 1, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:inventory:query',   '#', 'admin', NOW(), '');
 
 -- 入库管理按钮（TStockInController 生成器默认权限）
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) VALUES
-(2053, '入库查询', 2050, 3, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:query',   '#', 'admin', NOW(), ''),
-(2054, '入库新增', 2050, 4, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:add',     '#', 'admin', NOW(), ''),
-(2055, '入库修改', 2050, 5, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:edit',    '#', 'admin', NOW(), ''),
-(2056, '入库删除', 2050, 6, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:remove',  '#', 'admin', NOW(), ''),
-(2057, '入库导出', 2050, 7, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:export',  '#', 'admin', NOW(), '');
+(2053, '入库查询', 2052, 1, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:query',   '#', 'admin', NOW(), ''),
+(2054, '入库新增', 2052, 2, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:add',     '#', 'admin', NOW(), ''),
+(2055, '入库修改', 2052, 3, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:edit',    '#', 'admin', NOW(), ''),
+(2056, '入库删除', 2052, 4, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:remove',  '#', 'admin', NOW(), ''),
+(2057, '入库导出', 2052, 5, '', NULL, 1, 0, 'F', '0', '0', 'restaurant:stockIn:export',  '#', 'admin', NOW(), '');
 
 -- 菜品配方按钮
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) VALUES
@@ -140,7 +143,8 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
 (101, 2040),  -- 食材档案
 (101, 2041), (101, 2042), (101, 2043), (101, 2044),  -- 食材按钮
 (101, 2050),  -- 库存管理
-(101, 2051), (101, 2052),  -- 库存按钮（查询 + 入库登记）
+(101, 2051),  -- 库存查询
+(101, 2052),  -- 入库管理
 (101, 2053), (101, 2054), (101, 2055), (101, 2056), (101, 2057);  -- 入库管理按钮（TStockInController）
 
 -- ============================================================
