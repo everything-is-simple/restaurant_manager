@@ -42,3 +42,28 @@ export function delOrder(orderId) {
     method: 'delete'
   })
 }
+
+// 模拟下单
+export function mockOrder(data) {
+  return request({
+    url: '/restaurant/order/mock',
+    method: 'post',
+    data: data
+  })
+}
+
+// 完成订单
+export function completeOrder(orderId) {
+  return request({
+    url: '/restaurant/order/complete/' + orderId,
+    method: 'put'
+  })
+}
+
+// 退单
+export function cancelOrder(orderId) {
+  return request({
+    url: '/restaurant/order/cancel/' + orderId,
+    method: 'put'
+  })
+}

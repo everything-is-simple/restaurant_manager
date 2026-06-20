@@ -101,5 +101,39 @@ public class TOrderController extends BaseController
     {
         return toAjax(tOrderService.deleteTOrderByOrderIds(orderIds));
     }
+
+    /**
+     * 模拟下单（生成订单号 + 批量插入明细 + 状态=1已下单）
+     */
+    @PreAuthorize("@ss.hasPermi('restaurant:order:mock')")
+    @Log(title = "订单", businessType = BusinessType.INSERT)
+    @PostMapping("/mock")
+    public AjaxResult mock(@RequestBody TOrder tOrder)
+    {
+        Long orderId = tOrderService.mockOrder(tOrder);
+        return AjaxResult.success(orderId);
+    }
+
+    /**
+     * 完成订单（事务 + 按配方扣库存 + 状态=2已完成）
+     */
+    @PreAuthorize("@ss.hasPermi('restaurant:order:complete')")
+    @Log(title = "订单", businessType = BusinessType.UPDATE)
+    @PutMapping("/complete/{orderId}")
+    public AjaxResult complete(@PathVariable Long orderId)
+    {
+        return toAjax(tOrderService.completeOrder(orderId));
+    }
+
+    /**
+     * 退单（事务 + 回滚库存 + 状态=3已退单）
+     */
+    @PreAuthorize("@ss.hasPermi('restaurant:order:cancel')")
+    @Log(title = "订单", businessType = BusinessType.UPDATE)
+    @PutMapping("/cancel/{orderId}")
+    public AjaxResult cancel(@PathVariable Long orderId)
+    {
+        return toAjax(tOrderService.cancelOrder(orderId));
+    }
 }
 

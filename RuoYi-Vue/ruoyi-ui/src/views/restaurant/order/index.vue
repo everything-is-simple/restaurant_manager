@@ -62,6 +62,16 @@
       </el-col>
       <el-col :span="1.5">
         <el-button
+          type="info"
+          plain
+          icon="el-icon-s-order"
+          size="mini"
+          @click="handleMock"
+          v-hasPermi="['restaurant:order:mock']"
+        >模拟下单</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
           type="success"
           plain
           icon="el-icon-edit"
@@ -115,7 +125,7 @@
           <span>{{ parseTime(scope.row.completeTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -124,6 +134,22 @@
             @click="handleUpdate(scope.row)"
             v-hasPermi="['restaurant:order:edit']"
           >修改</el-button>
+          <el-button
+            v-if="scope.row.status === 1"
+            size="mini"
+            type="text"
+            icon="el-icon-check"
+            @click="handleComplete(scope.row)"
+            v-hasPermi="['restaurant:order:complete']"
+          >完成</el-button>
+          <el-button
+            v-if="scope.row.status === 2"
+            size="mini"
+            type="text"
+            icon="el-icon-refresh-left"
+            @click="handleCancel(scope.row)"
+            v-hasPermi="['restaurant:order:cancel']"
+          >退单</el-button>
           <el-button
             size="mini"
             type="text"
@@ -190,11 +216,6 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="删除标志" prop="delFlag">
-              <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
             <el-form-item label="备注" prop="remark">
               <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
             </el-form-item>
@@ -206,11 +227,62 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 模拟下单对话框 -->
+    <el-dialog title="模拟下单" :visible.sync="mockOpen" width="700px" append-to-body>
+      <el-form label-width="80px">
+        <el-form-item label="菜品明细">
+          <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="addMockItem">添加菜品</el-button>
+        </el-form-item>
+        <el-table :data="mockForm.orderItems" border size="small">
+          <el-table-column label="菜品" align="center" width="220">
+            <template slot-scope="scope">
+              <el-select v-model="scope.row.dishId" placeholder="请选择菜品" size="small" @change="(val) => onDishChange(scope.row, val)">
+                <el-option
+                  v-for="dish in dishList"
+                  :key="dish.dishId"
+                  :label="dish.name"
+                  :value="dish.dishId"
+                />
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="单价" align="center" width="100">
+            <template slot-scope="scope">
+              ¥{{ scope.row.price }}
+            </template>
+          </el-table-column>
+          <el-table-column label="份数" align="center" width="120">
+            <template slot-scope="scope">
+              <el-input-number v-model="scope.row.quantity" :min="1" :max="99" size="small" controls-position="right" />
+            </template>
+          </el-table-column>
+          <el-table-column label="小计" align="center" width="100">
+            <template slot-scope="scope">
+              ¥{{ (scope.row.price * scope.row.quantity).toFixed(2) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center">
+            <template slot-scope="scope">
+              <el-button type="text" size="mini" icon="el-icon-delete" @click="removeMockItem(scope.$index)">移除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-form-item label="备注" style="margin-top: 15px;">
+          <el-input v-model="mockForm.remark" type="textarea" placeholder="订单备注（选填）" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitMock">下 单</el-button>
+        <el-button @click="mockOpen = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listOrder, getOrder, delOrder, addOrder, updateOrder } from "@/api/restaurant/order"
+import { listOrder, getOrder, delOrder, addOrder, updateOrder, mockOrder, completeOrder, cancelOrder } from "@/api/restaurant/order"
+import { listDish } from "@/api/restaurant/dish"
 
 export default {
   name: "Order",
@@ -231,10 +303,19 @@ export default {
       total: 0,
       // 订单表格数据
       orderList: [],
+      // 菜品列表（模拟下单用）
+      dishList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
       open: false,
+      // 是否显示模拟下单弹窗
+      mockOpen: false,
+      // 模拟下单表单
+      mockForm: {
+        remark: null,
+        orderItems: []
+      },
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -258,14 +339,12 @@ export default {
         status: [
           { required: true, message: "订单状态不能为空", trigger: "change" }
         ],
-        delFlag: [
-          { required: true, message: "删除标志不能为空", trigger: "blur" }
-        ],
       }
     }
   },
   created() {
     this.getList()
+    this.getDishList()
   },
   methods: {
     /** 查询订单列表 */
@@ -291,7 +370,6 @@ export default {
         status: null,
         orderTime: null,
         completeTime: null,
-        delFlag: null,
         createBy: null,
         createTime: null,
         updateBy: null,
@@ -367,6 +445,68 @@ export default {
       this.download('restaurant/order/export', {
         ...this.queryParams
       }, `order_${new Date().getTime()}.xlsx`)
+    },
+    /** 加载菜品列表（模拟下单用） */
+    getDishList() {
+      listDish({ pageNum: 1, pageSize: 999, status: '0' }).then(response => {
+        this.dishList = response.rows
+      })
+    },
+    /** 打开模拟下单弹窗 */
+    handleMock() {
+      this.mockForm = { remark: null, orderItems: [] }
+      this.mockOpen = true
+    },
+    /** 添加模拟下单菜品行 */
+    addMockItem() {
+      this.mockForm.orderItems.push({ dishId: null, dishName: null, price: 0, quantity: 1 })
+    },
+    /** 移除模拟下单菜品行 */
+    removeMockItem(index) {
+      this.mockForm.orderItems.splice(index, 1)
+    },
+    /** 菜品选择变更时回填菜品名和单价 */
+    onDishChange(row, dishId) {
+      const dish = this.dishList.find(d => d.dishId === dishId)
+      if (dish) {
+        row.dishName = dish.name
+        row.price = dish.price
+      }
+    },
+    /** 提交模拟下单 */
+    submitMock() {
+      if (this.mockForm.orderItems.length === 0) {
+        this.$modal.msgError("请至少添加一个菜品")
+        return
+      }
+      const invalid = this.mockForm.orderItems.find(item => !item.dishId || !item.quantity || item.quantity < 1)
+      if (invalid) {
+        this.$modal.msgError("请选择菜品并填写有效份数")
+        return
+      }
+      mockOrder(this.mockForm).then(response => {
+        this.$modal.msgSuccess("下单成功，订单ID：" + response.data)
+        this.mockOpen = false
+        this.getList()
+      })
+    },
+    /** 完成订单 */
+    handleComplete(row) {
+      this.$modal.confirm('确认完成订单"' + row.orderNo + '"吗？完成后将按配方扣减库存。').then(() => {
+        return completeOrder(row.orderId)
+      }).then(() => {
+        this.$modal.msgSuccess("订单已完成，库存已扣减")
+        this.getList()
+      }).catch(() => {})
+    },
+    /** 退单 */
+    handleCancel(row) {
+      this.$modal.confirm('确认退单"' + row.orderNo + '"吗？退单后将回滚库存。').then(() => {
+        return cancelOrder(row.orderId)
+      }).then(() => {
+        this.$modal.msgSuccess("退单成功，库存已回滚")
+        this.getList()
+      }).catch(() => {})
     }
   }
 }

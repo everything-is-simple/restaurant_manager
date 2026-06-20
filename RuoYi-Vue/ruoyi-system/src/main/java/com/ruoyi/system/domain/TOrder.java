@@ -2,9 +2,12 @@ package com.ruoyi.system.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.List;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -46,7 +49,10 @@ public class TOrder extends BaseEntity
     /** 删除标志（0正常 2删除） */
     private String delFlag;
 
-    public void setOrderId(Long orderId) 
+    /** 订单明细列表（非持久化，模拟下单时接收前端菜品列表） */
+    private List<TOrderItem> orderItems;
+
+    public void setOrderId(Long orderId)
     {
         this.orderId = orderId;
     }
@@ -114,6 +120,16 @@ public class TOrder extends BaseEntity
     public String getDelFlag() 
     {
         return delFlag;
+    }
+
+    public List<TOrderItem> getOrderItems()
+    {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<TOrderItem> orderItems)
+    {
+        this.orderItems = orderItems;
     }
 
     @Override

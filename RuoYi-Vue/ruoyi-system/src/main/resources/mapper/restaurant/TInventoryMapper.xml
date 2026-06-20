@@ -77,9 +77,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTInventoryByInventoryIds" parameterType="String">
-        delete from t_inventory where inventory_id in 
+        delete from t_inventory where inventory_id in
         <foreach item="inventoryId" collection="array" open="(" separator="," close=")">
             #{inventoryId}
         </foreach>
     </delete>
+
+    <!-- 按食材ID扣减库存（防并发超扣：WHERE stock >= deductQty） -->
+    <update id="deductStock">
+        update t_inventory set stock = stock - #{deductQty}
+        where ingredient_id = #{ingredientId} and stock >= #{deductQty}
+    </update>
+
+    <!-- 按食材ID增加库存（退单回滚用） -->
+    <update id="addStock">
+        update t_inventory set stock = stock + #{addQty}
+        where ingredient_id = #{ingredientId}
+    </update>
 </mapper>
