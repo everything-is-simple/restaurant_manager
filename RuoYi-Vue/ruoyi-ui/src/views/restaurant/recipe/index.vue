@@ -36,6 +36,7 @@
                 v-model="scope.row.ingredientId"
                 filterable
                 clearable
+                :disabled="!canEdit"
                 placeholder="请选择食材"
                 style="width: 100%"
               >
@@ -55,19 +56,20 @@
                 :min="0.01"
                 :precision="2"
                 :step="0.1"
+                :disabled="!canEdit"
                 controls-position="right"
                 style="width: 100%"
               />
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="100">
+          <el-table-column v-if="canEdit" label="操作" width="100">
             <template slot-scope="scope">
               <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDeleteRow(scope.$index)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
 
-        <div class="recipe-actions">
+        <div v-if="canEdit" class="recipe-actions">
           <el-button type="primary" plain icon="el-icon-plus" @click="handleAddRow">新增食材</el-button>
           <el-button type="success" icon="el-icon-check" :loading="saving" @click="handleSubmit">保存配方</el-button>
         </div>
@@ -91,6 +93,11 @@ export default {
       ingredientOptions: [],
       recipeList: [],
       saving: false
+    }
+  },
+  computed: {
+    canEdit() {
+      return this.$auth.hasPermi('restaurant:recipe:save')
     }
   },
   created() {
