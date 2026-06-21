@@ -1,129 +1,88 @@
 # 文瀛餐厅管理系统 — 技术方案与安装使用说明
 
-## 1. 最终技术选型
+## 1. 项目说明
 
-本项目以本地现有 `RuoYi-Vue` 经典版为唯一底座，不采用其他历史备选路线。
+文瀛餐厅管理系统是中北大学课程/答辩项目，基于 RuoYi-Vue 3.9.2 经典版二次开发。系统聚焦高校食堂后台管理，不开发真实点餐小程序和在线支付，使用后台“模拟下单”完成演示闭环。
+
+核心演示链路：`配方维护 -> 食材入库 -> 模拟下单 -> 完成订单 -> 按配方扣库存 -> 看板统计`。
+
+实际运行工程根目录固定为：
+
+```powershell
+G:\restaurant_manager\RuoYi-Vue
+```
+
+施工文档根目录固定为：
+
+```powershell
+G:\restaurant_manager\docs\plan_ruoyi_classic
+```
+
+## 2. 技术选型
 
 | 层次 | 技术 |
 |------|------|
 | 脚手架 | RuoYi-Vue 3.9.2 经典版 |
-| 后端 | Java 17 + Spring Boot 4.x |
-| 安全 | Spring Security + JWT |
-| 缓存 | Redis 6/7 |
+| 后端 | Java 17 + Spring Boot + Spring Security + JWT |
 | 持久层 | MyBatis + XML |
+| 数据库 | MySQL 8.x，库名 `ry-vue` |
+| 缓存 | Redis 6/7 |
 | 前端 | Vue 2 + Vue CLI + Element UI + Vuex |
 | 图表 | ECharts 5.x |
-| 数据库 | MySQL 8.x Community |
 | 构建 | Maven + npm |
-| 接口文档 | Springdoc / Swagger UI |
 
-## 2. 真实仓库结构
+业务代码不新建独立 Maven 子模块，沿用 RuoYi-Vue 现有聚合结构：
 
-当前施工代码底座位于 `F:\restaurant_manager\RuoYi-Vue`。
+| 层 | 位置 |
+|----|------|
+| Controller | `RuoYi-Vue/ruoyi-admin/src/main/java/com/ruoyi/web/controller/restaurant/` |
+| Domain / Mapper / Service | `RuoYi-Vue/ruoyi-system/src/main/java/com/ruoyi/system/` |
+| Mapper XML | `RuoYi-Vue/ruoyi-system/src/main/resources/mapper/restaurant/` |
+| 前端页面 | `RuoYi-Vue/ruoyi-ui/src/views/restaurant/` |
+| 前端 API | `RuoYi-Vue/ruoyi-ui/src/api/restaurant/` |
 
-业务代码默认落位：
-
-- Controller：`ruoyi-admin`
-- Domain / Mapper / Service：`ruoyi-system`
-- Mapper XML：`ruoyi-system/src/main/resources/mapper`
-- 前端页面：`ruoyi-ui/src/views/restaurant`
-- 前端 API：`ruoyi-ui/src/api/restaurant`
-
-不新建独立 Maven 子模块，优先贴合若依现有结构以减少改造成本。
-
-## 3. 必装软件
+## 3. 环境要求
 
 - JDK 17
 - Maven 3.9 或更高版本
-- MySQL 8.x Community，优先 8.4 LTS
+- MySQL 8.x Community
 - Redis 6 或 7
 - Node.js 16 LTS
 - npm
 
-## 4. 本机当前已知风险
+说明：RuoYi-Vue 经典版前端基于 Vue CLI 4，Node 16 LTS 兼容性更稳，不建议使用过新的 Node 版本作为答辩环境。
 
-按当前环境检查结果，存在以下问题：
+## 4. 数据库初始化
 
-- `java` 命令不可用
-- `mvn` 命令不可用
-- Node 当前为 `v26.1.0`
-- 当前环境中没有额外前端包管理器，本方案只使用 `npm`
-
-说明：
-
-- 若依经典版前端使用 Vue CLI 4，Node 16 LTS 更稳，Node 26 存在兼容风险
-- 后端启动前必须先正确安装并配置 JDK 17 与 Maven 环境变量
-
-## 5. 安装步骤
-
-### 5.1 安装 JDK 17
-
-1. 下载并安装 JDK 17
-2. 配置 `JAVA_HOME`
-3. 将 `%JAVA_HOME%\\bin` 加入 `Path`
-4. 终端执行 `java -version` 验证
-
-### 5.2 安装 Maven 3.9+
-
-1. 下载 Maven 3.9+
-2. 配置 `MAVEN_HOME`
-3. 将 `%MAVEN_HOME%\\bin` 加入 `Path`
-4. 终端执行 `mvn -version` 验证
-
-### 5.3 安装 MySQL 8.x Community
-
-1. 安装 MySQL Community Server
-2. 记录 root 密码
-3. 确保本地能连接 `localhost:3306`
-
-建议：
-
-- Windows 直接安装 MSI 版本
-- 优先 MySQL 8.4 LTS
-
-### 5.4 安装 Redis
-
-1. 安装 Redis
-2. 启动本地实例
-3. 保持默认地址 `localhost:6379`
-
-### 5.5 安装 Node.js 16 LTS
-
-1. 安装 Node.js 16 LTS
-2. 执行 `node -v` 和 `npm -v`
-3. 确保不是 Node 26 这类过新版本
-
-## 6. 数据库初始化
-
-### 6.1 创建数据库
+### 4.1 创建数据库
 
 ```sql
 CREATE DATABASE `ry-vue` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ```
 
-### 6.2 导入若依初始化 SQL
+### 4.2 导入基础表和业务表
 
-执行：
+按顺序执行：
 
-- `F:\restaurant_manager\RuoYi-Vue\sql\ry_20260417.sql`
+```powershell
+G:\restaurant_manager\RuoYi-Vue\sql\ry_20260417.sql
+G:\restaurant_manager\docs\plan_ruoyi_classic\schema.sql
+G:\restaurant_manager\docs\plan_ruoyi_classic\menu_init.sql
+```
 
-### 6.3 导入业务表 SQL
+导入完成后，应同时拥有 RuoYi 基础 `sys_*` 表、餐厅业务 `t_*` 表、餐厅业务菜单、MANAGER/STOCK_KEEPER 角色和两个测试账号。
 
-执行：
+## 5. 配置说明
 
-- `F:\restaurant_manager\docs\plan_ruoyi_classic\schema.sql`
-
-导入完成后，应同时拥有若依自带 `sys_*` 表和业务 `t_*` 表。
-
-## 7. 配置修改
-
-### 7.1 数据库配置
+### 5.1 数据库配置
 
 文件：
 
-- `F:\restaurant_manager\RuoYi-Vue\ruoyi-admin\src\main\resources\application-druid.yml`
+```powershell
+G:\restaurant_manager\RuoYi-Vue\ruoyi-admin\src\main\resources\application-druid.yml
+```
 
-需要修改：
+关键配置：
 
 ```yaml
 spring:
@@ -135,13 +94,15 @@ spring:
         password: 你的MySQL密码
 ```
 
-### 7.2 Redis 配置
+### 5.2 Redis 配置
 
 文件：
 
-- `F:\restaurant_manager\RuoYi-Vue\ruoyi-admin\src\main\resources\application.yml`
+```powershell
+G:\restaurant_manager\RuoYi-Vue\ruoyi-admin\src\main\resources\application.yml
+```
 
-默认即可：
+默认本地配置：
 
 ```yaml
 spring:
@@ -151,87 +112,129 @@ spring:
       port: 6379
 ```
 
-## 8. 启动方式
+## 6. 构建与启动
 
-### 8.1 启动后端
+### 6.1 后端编译
 
-在 `F:\restaurant_manager\RuoYi-Vue` 下执行：
+在 `G:\restaurant_manager\RuoYi-Vue` 执行：
 
-```bash
-mvn clean install
-mvn --projects ruoyi-admin spring-boot:run
+```powershell
+mvn -pl ruoyi-admin -am compile
 ```
 
-默认端口：
+### 6.2 后端打包
 
-- 后端 `http://localhost:8080`
+```powershell
+mvn -pl ruoyi-admin -am package -DskipTests
+```
 
-### 8.2 启动前端
+打包产物位于：
 
-在 `F:\restaurant_manager\RuoYi-Vue\ruoyi-ui` 下执行：
+```powershell
+G:\restaurant_manager\RuoYi-Vue\ruoyi-admin\target\ruoyi-admin.jar
+```
 
-```bash
+### 6.3 后端运行
+
+```powershell
+java -jar G:\restaurant_manager\RuoYi-Vue\ruoyi-admin\target\ruoyi-admin.jar
+```
+
+默认后端地址：`http://127.0.0.1:8080`。
+
+### 6.4 前端依赖与开发服务
+
+在 `G:\restaurant_manager\RuoYi-Vue\ruoyi-ui` 执行：
+
+```powershell
 npm install
 npm run dev
 ```
 
-默认前端开发端口：
+默认前端地址：`http://127.0.0.1`。
 
-- `http://localhost`
+### 6.5 前端生产构建
 
-说明：
+```powershell
+npm run build:prod
+```
 
-- 当前若依前端基于 Vue CLI 和 `vue.config.js` 代理配置
-- API 代理由 `VUE_APP_BASE_API=/dev-api` 和 `vue.config.js` 提供
+生产构建产物位于：
 
-## 9. 首次使用步骤
+```powershell
+G:\restaurant_manager\RuoYi-Vue\ruoyi-ui\dist
+```
 
-1. 浏览器打开前端登录页
-2. 使用默认账号 `admin / admin123` 登录
-3. 在“系统工具 -> 代码生成”中导入业务表
-4. 生成基础 CRUD 代码
-5. 合并生成代码到若依项目
-6. 在“系统管理 -> 菜单管理”中配置餐厅业务菜单
-7. 创建角色：
-   - ADMIN
-   - MANAGER
-   - STOCK_KEEPER
-8. 创建测试账号：
-   - `manager / manager123`
-   - `stockkeeper / stock123`
+## 7. 登录账号
 
-## 10. 演示链路
+| 账号 | 密码 | 角色 | 答辩用途 |
+|------|------|------|----------|
+| `admin` | `admin123` | 超级管理员 | 查看全部系统与餐厅功能 |
+| `manager` | `admin123` | 食堂经理 | 菜品、配方、订单、库存查看、数据看板 |
+| `stockkeeper` | `admin123` | 库管员 | 食材、入库、库存管理 |
 
-建议答辩演示顺序：
+权限隔离口径：MANAGER 不负责食材档案维护和入库管理；STOCK_KEEPER 不负责订单操作和数据看板。
 
-1. 使用不同角色登录，展示权限隔离
-2. 维护一条菜品配方
-3. 录入一笔食材入库
-4. 后台模拟下单
-5. 完成订单
-6. 查看库存自动扣减
-7. 查看看板数据变化
+## 8. 核心接口
 
-## 11. 核心接口
+所有业务接口均走 RuoYi 前端代理前缀，前端开发环境请求形态为 `/dev-api/restaurant/...`，后端 Controller 实际路径为 `/restaurant/...`。
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/dish/list` | 菜品列表 |
-| GET | `/api/category/list` | 分类列表 |
-| GET | `/api/ingredient/list` | 食材列表 |
-| GET | `/api/inventory/list` | 库存列表 |
-| POST | `/api/stockIn` | 入库登记 |
-| GET | `/api/recipe/list` | 配方查询 |
-| POST | `/api/recipe/save` | 配方保存 |
-| GET | `/api/order/list` | 订单列表 |
-| POST | `/api/order/mock` | 模拟下单 |
-| PUT | `/api/order/complete/{id}` | 完成订单并扣库存 |
-| PUT | `/api/order/cancel/{id}` | 退单 |
-| GET | `/api/stats/overview` | 看板数据 |
+| 方法 | 后端路径 | 说明 |
+|------|----------|------|
+| GET | `/restaurant/category/list` | 菜品分类列表 |
+| GET | `/restaurant/dish/list` | 菜品列表 |
+| GET | `/restaurant/ingredient/list` | 食材列表 |
+| GET | `/restaurant/inventory/list` | 库存列表 |
+| POST | `/restaurant/stockIn` | 新增入库并联动库存 |
+| GET | `/restaurant/recipe/list/{dishId}` | 查询菜品配方 |
+| PUT | `/restaurant/recipe/save` | 覆盖保存菜品配方 |
+| GET | `/restaurant/order/list` | 订单列表 |
+| POST | `/restaurant/order/mock` | 模拟下单 |
+| PUT | `/restaurant/order/complete/{orderId}` | 完成订单并按配方扣库存 |
+| PUT | `/restaurant/order/cancel/{orderId}` | 退单并回滚库存 |
+| GET | `/restaurant/stats/dashboard` | 看板聚合数据 |
+| GET | `/restaurant/stats/warning` | 库存预警列表 |
 
-## 12. 关键技术说明
+## 9. 演示链路
 
-- 配方联动是系统核心价值点
-- 完成订单时按“菜品配方 × 份数”扣减库存
-- 扣减 SQL 使用 `stock >= deduct` 条件避免超扣
-- 业务异常使用若依统一异常处理返回提示
+答辩推荐演示顺序：
+
+1. 打开登录页，展示系统标题和品牌为“文瀛餐厅管理系统”。
+2. 使用 `manager/admin123` 登录，展示首页、菜品、配方、订单、看板。
+3. 在菜品或配方页面说明菜品与食材用量关系。
+4. 展示库存和入库记录，说明入库会增加库存。
+5. 在订单页使用“模拟下单”生成订单。
+6. 点击“完成订单”，说明系统按 `菜品配方 × 份数` 扣减库存。
+7. 回到看板，展示今日营收、今日订单数、销量 Top10 和库存预警变化。
+8. 使用 `stockkeeper/admin123` 登录，展示库管员只能看到食材、入库、库存相关菜单。
+
+## 10. 截图清单
+
+答辩材料截图统一保存到：
+
+```powershell
+G:\restaurant_manager\docs\plan_ruoyi_classic\assets\d10
+```
+
+建议截图：
+
+| 文件名 | 内容 |
+|--------|------|
+| `01-login.png` | 登录页品牌 |
+| `02-dashboard.png` | 首页总览 |
+| `03-recipe.png` | 菜品配方页 |
+| `04-stock-in.png` | 入库管理页 |
+| `05-order.png` | 订单管理页 |
+| `06-stats.png` | 数据看板页 |
+| `07-role-manager.png` | 食堂经理菜单 |
+| `08-role-stockkeeper.png` | 库管员菜单 |
+
+## 11. 核心技术说明
+
+- 新增食材时自动初始化库存，避免食材存在但库存缺行。
+- 入库新增、修改、删除均在事务中按差额联动库存。
+- 配方保存采用按 `dish_id` 覆盖保存，保证菜品扣减口径唯一。
+- 模拟下单不信任前端传入菜名和价格，后端按 `dishId` 读取真实菜品信息。
+- 完成订单使用事务，按配方扣库存，并通过 `UPDATE ... WHERE stock >= deduct` 避免并发超扣。
+- 退单会按原订单明细回滚库存。
+- 看板统计以已完成订单和 `complete_time` 为经营数据口径。

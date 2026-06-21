@@ -18,8 +18,12 @@
 | [03_Design_系统设计文档.md](plan_ruoyi_classic/03_Design_系统设计文档.md) | 架构、模块、数据流、权限矩阵 |
 | [04_施工计划_当前进度版.md](plan_ruoyi_classic/04_施工计划_当前进度版.md) | D1-D10 逐日排期 + 当前进度标记 + 业务算法清单 |
 | [05_Core_Algorithm_核心算法说明.md](plan_ruoyi_classic/05_Core_Algorithm_核心算法说明.md) | 扣库存事务、状态机、看板统计 SQL |
+| [06_用户使用说明.md](plan_ruoyi_classic/06_用户使用说明.md) | 三角色使用说明、主链路操作、常见提示 |
+| [07_答辩演示脚本.md](plan_ruoyi_classic/07_答辩演示脚本.md) | 3-5 分钟答辩演示流程和讲解词 |
 | [08_Menu_Permission_菜单与权限初始化清单.md](plan_ruoyi_classic/08_Menu_Permission_菜单与权限初始化清单.md) | 菜单树、按钮权限、角色分配 |
-| [menu_init.sql](plan_ruoyi_classic/menu_init.sql) | 菜单/角色/用户初始化 SQL（31 菜单 + 2 角色 + 2 测试账号） |
+| [09_答辩PPT大纲.md](plan_ruoyi_classic/09_答辩PPT大纲.md) | 12 页答辩 PPT 素材稿和讲稿 |
+| [10_彩排检查记录.md](plan_ruoyi_classic/10_彩排检查记录.md) | 彩排检查项、验证记录、自动化限制说明 |
+| [menu_init.sql](plan_ruoyi_classic/menu_init.sql) | 菜单/角色/用户初始化 SQL（36 业务菜单/按钮 + 2 角色 + 2 测试账号） |
 | [schema.sql](plan_ruoyi_classic/schema.sql) | 8 张业务表 + 演示数据 |
 | [gen_config_update.sql](plan_ruoyi_classic/gen_config_update.sql) | 若依代码生成器配置脚本（包名/模块名/字典） |
 
