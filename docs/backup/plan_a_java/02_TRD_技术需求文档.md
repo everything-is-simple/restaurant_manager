@@ -554,8 +554,7 @@ onMounted(async () => {
 ## 8. 若依快速上手步骤
 
 ```bash
-# 1. 克隆若依 Vue3 版本
-git clone https://github.com/yangzongzhuan/RuoYi-Vue.git
+# 1. 使用本地 RuoYi-Vue 工程
 cd RuoYi-Vue
 
 # 2. 导入数据库

@@ -17,7 +17,7 @@
 你只需要：建好 8 张业务表 → 用代码生成器出基础 CRUD → 在生成的代码上写业务逻辑。
 估计节省 **40% 的工作量**。
 
-**官方仓库（Vue3 版）**：https://github.com/yangzongzhuan/RuoYi-Vue
+**底座说明**：当前项目已采用本地 `RuoYi-Vue` 工程作为二次开发底座。
 
 ---
 
@@ -284,7 +284,7 @@ GROUP BY dish_name ORDER BY qty DESC LIMIT 10;
 | 前端 | Vue3 + Element Plus + ECharts |
 | 优势 | RBAC/JWT/代码生成器免费得；中文文档完整；毕设同类项目最多 |
 | 适合 | 学过 Spring Boot，哪怕只学了一学期 |
-| 参考 | https://github.com/yangzongzhuan/RuoYi-Vue |
+| 参考 | 本地 `RuoYi-Vue` 工程 |
 
 ### 方案 B：FastAPI + Python（备选）
 

@@ -9,12 +9,12 @@ export default {
   name: 'RuoYiDoc',
   data() {
     return {
-      url: 'http://doc.ruoyi.vip/ruoyi-vue'
+      message: '项目文档见 docs/plan_ruoyi_classic'
     }
   },
   methods: {
     goto() {
-      window.open(this.url)
+      this.$message.info(this.message)
     }
   }
 }

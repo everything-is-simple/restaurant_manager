@@ -9,12 +9,12 @@ export default {
   name: 'RuoYiGit',
   data() {
     return {
-      url: 'https://gitee.com/y_project/RuoYi-Vue'
+      message: '文瀛餐厅管理系统'
     }
   },
   methods: {
     goto() {
-      window.open(this.url)
+      this.$message.info(this.message)
     }
   }
 }

@@ -1,9 +1,10 @@
+## 文瀛餐厅管理系统前端
+
+本目录是文瀛餐厅管理系统的前端工程，基于 Vue 2、Element UI 和 RuoYi-Vue 经典版前端结构二次开发。
+
 ## 开发
 
 ```bash
-# 克隆项目
-git clone https://gitee.com/y_project/RuoYi-Vue
-
 # 进入项目目录
 cd ruoyi-ui
 
